@@ -380,7 +380,7 @@ function calc(f,scenario){
   const denied=fakes.filter(k=>k.age<3), stuck=fakes.filter(k=>k.age>=3);
   const items=[]; let net=0; // net = あなたの財布（万円）。＋受け取る／−払う
   // 1 否認
-  if(f.hidden) items.push({what:"托卵のこと",amt:"バレていない",law:"",why:"夫は何も知らないまま、離婚に応じた。子どもは全員、法律上は夫の子のまま。3年が過ぎているので、あとで知っても夫はもう否認できない（民法777条）。"});
+  if(f.hidden) items.push({what:"托卵のこと",amt:"バレていない",law:"",why:"夫は何も知らないまま、離婚に応じた。子どもは全員、法律上は夫の子のまま。"+(fakes.every(k=>k.age>=3)?"3年が過ぎているので、あとで知っても夫はもう否認できない（民法777条）。":"ただし、3歳になっていない托卵の子は、夫があとで知れば否認できる（民法777条）。")});
   (f.hidden?[]:fakes).forEach(k=>{
     const ok=k.age<3;
     items.push({what:`托卵の子（${k.age}歳）の嫡出否認`,amt: ok?"否認できる":"否認できない",law:"民法777条",
@@ -392,12 +392,12 @@ function calc(f,scenario){
   const ishaRaw=isha; isha=Math.min(isha,300);
   if(f.confess) isha-=50;
   if(f.husAffair) isha-=50;
-  if(f.hidden) isha=-incAdj0(f);
+  if(f.hidden) isha=-incAdj0(f)-(f.hAff?150:0);
   const incAdj = f.w>500 ? Math.min(Math.round((f.w-500)/100)*10,50) : 0; isha+=incAdj;
   const ishaF=`不貞 200万 ＋ 托卵 50万`+(f.years>5?` ＋ 結婚年数 (${f.years}−5)×3万`:"")+(fakes.length>1?` ＋ 托卵の子2人目から ${fakes.length-1}×20万`:"")+(stuck.length?` ＋ 否認できない子 ${stuck.length}×20万`:"")+` ＝ ${man(Math.min(ishaRaw,300))}`+(ishaRaw>300?"（上限300万円）":"")+(incAdj?`\n妻の年収 ${man(f.w)} が高いので ＋${man(incAdj)} ＝ ${man(isha)}`:"");
   net += meHusband? isha : -isha;
   const confF=(f.confess?`\n自分から打ち明けた −50万（ゲームの決まり）`:"")+(f.husAffair?`\n夫も不倫をしていた −50万（おたがいさまの分。ゲームの決まり）`:"")+(f.confess||f.husAffair?` ＝ ${man(isha)}`:"");
-  items.push(f.hidden?{what:"慰謝料",amt:"0円",law:"",why:"托卵も不倫もバレていないので、慰謝料は払わない。離婚の理由は「性格の不一致」。ただし、あとでバレたら夫は慰謝料を請求できる（知ってから3年以内）。"}:{what:"慰謝料（妻 → 夫）",amt:(meHusband?"＋":"−")+man(isha),law:"民法709・710条",
+  items.push(f.hidden&&f.hAff?{what:"慰謝料（夫 → 妻）",amt:(meHusband?"−":"＋")+man(150),law:"民法709・710条",why:"夫の浮気（不貞）が離婚の理由になった。不貞で離婚する場合の慰謝料の目安は100万〜300万円で、ここでは150万円。托卵はバレていないので、妻は払わない。ただし、あとでバレたら夫は慰謝料を請求できる（知ってから3年以内）。慰謝料は、受け取った側に原則として税金がかからない。"}:f.hidden?{what:"慰謝料",amt:"0円",law:"",why:"托卵も不倫もバレていないので、慰謝料は払わない。離婚の理由は「性格の不一致」。ただし、あとでバレたら夫は慰謝料を請求できる（知ってから3年以内）。"}:{what:"慰謝料（妻 → 夫）",amt:(meHusband?"＋":"−")+man(isha),law:"民法709・710条",
     f:ishaF+confF,why:`不貞と托卵は妻の側に責任がある。托卵で離婚する場合の目安は200万〜300万円（妻と浮気相手を合わせた額）。結婚年数（${f.years}年）や子どもの数で上乗せするのはゲーム用の計算で、上限は300万円。慰謝料は、受け取った側に原則として税金がかからない。`+(incAdj?"払う側の収入は、裁判では影響が小さい要素とされるが、収入が高いと少し上がることがある（ゲームでは妻の年収500万円を超えた分100万円ごとに＋10万円、最大＋50万円）。":"")+(f.w<100?" 妻の収入が少ないので、実際には分割払いになったり、取り立てられないこともある。":"")});
   // 3 財産分与：半分ずつ
   const half=f.assets/2, hPays=f.hAssets-half; // ＋なら夫が妻に払う
@@ -490,7 +490,7 @@ function calc(f,scenario){
   if(f.extra){ net-=f.extra; items.push({what:"発覚の前に払った口止めのお金",amt:"−"+man(f.extra),law:"",why:"不倫をかくすために、物語の中で払ったお金。"}); }
   items.push({f:costParts.length>1?costParts.join(" ＋ ")+` ＝ ${man(cost)}`:"",what:"手続きの費用",amt:"−"+man(cost),law:"目安",why:cWhy2});
   const supStuckNote = meHusband && supFromMe>0 && stuck.some(k=>kidsWithWife.includes(k)) ? `。この中には、否認できなかった托卵の子（${stuck.filter(k=>kidsWithWife.includes(k)).map(k=>k.age+"歳").join("、")}）の分も入っている` : "";
-  return {hidden:!!f.hidden,extra:f.extra||0,supStuckNote,items,net,konMe,konMonth,mo,konPayer,isha,hPays,supTot,supMonth,supToMe,supFromMe,supYears,supPayer,cost,denied,stuck,liveWith,meHusband,kidsWithWife,kidsWithHusband};
+  return {hAff:!!f.hAff,hidden:!!f.hidden,extra:f.extra||0,supStuckNote,items,net,konMe,konMonth,mo,konPayer,isha,hPays,supTot,supMonth,supToMe,supFromMe,supYears,supPayer,cost,denied,stuck,liveWith,meHusband,kidsWithWife,kidsWithHusband};
 }
 // 離婚しない：浮気相手に慰謝料、托卵の子は否認できるならする
 const STAY_ISHA=100, STAY_LAWYER=22; // 離婚しない不貞慰謝料の目安 50〜150万（托卵なので高め）、着手金 約22万
@@ -696,7 +696,7 @@ function startStory(){
   if(S.scenario!=="wife" && kids.some(k=>k.fake&&k.by<2)) kids.forEach(k=>k.by++);
   const firstFake=Math.min(...kids.filter(k=>k.fake).map(k=>k.by));
   S.mode="random"; S.path=[];
-  S.st={base:b,kids,firstFake,year:0,end:Math.min(30,Math.max(...kids.filter(k=>k.fake).map(k=>k.by))+18),log:[],sus:10,ev:null,used:[],usedC:[],usedH:[],care:0,rate:.20+R()*.15,save:0,assets:0,dA:0,tested:0};
+  S.st={base:b,kids,firstFake,year:0,end:Math.min(30,Math.max(...kids.filter(k=>k.fake).map(k=>k.by))+18),log:[],sus:10,ev:null,used:[],usedC:[],usedH:[],care:0,rate:.20+R()*.15,save:0,hAffYear:R()<.2?rint(3,14):0,assets:0,dA:0,tested:0};
   S.st.save=Math.round((takeHome(b.h)+takeHome(b.w))*S.st.rate);
   S.st.log.push("結婚した。"); viewYear();
 }
@@ -770,12 +770,28 @@ function wifeChain(){ // その年に起きる妻だけの出来事。あれば 
         hiddenDivorce(); }],
       ["このまま夫婦でいる",()=>{ st.log.push("何も言わなかった。"); wNext(); }]
     ]}; return true; }
+  if(born.length && st.hAffYear && y>=st.hAffYear){ st.hAffYear=0;
+    st.ev={t:"夫の浮気がわかった。スマホに、知らない女とのやりとりが残っていた。",opts:[
+      ["夫の浮気を理由に、離婚を切り出す",()=>{ st.log.push("スマホの画面を写真にとって、離婚を切り出した。");
+        if(R()<.2){ st.log.push("夫は「おまえはどうなんだ」と言い返し、こっそりDNA鑑定をした。"); st.forceMode="div"; return discover(); }
+        st.log.push("夫は、何も言い返せなかった。"); hiddenDivorce(true); }],
+      ["見なかったことにする",()=>{ st.log.push("スマホを、元の場所にもどした。おたがいさまだ、と思った。"); wNext(); }]
+    ]}; return true; }
+  if(born.length && (st.chances||0)<2 && !st.ev && (st.chanceWhy || R()<.03)){
+    const why=st.chanceWhy||["夫婦げんかが、何日も続いている。","夫が単身赴任になった。家にいるのは月に一度だけ。","夫が言った。「最近、俺たち合わないよな」。"][rint(0,2)];
+    st.chanceWhy=null; st.chances=(st.chances||0)+1;
+    st.ev={t:why+" 今なら、托卵がバレる前に離婚できるかもしれない。",opts:[
+      ["離婚を切り出す",()=>{ st.log.push("「もう、やっていけない」と言って、離婚を切り出した。");
+        if(R()<.25){ st.log.push("夫は急な話をあやしんで、こっそりDNA鑑定をした。"); st.forceMode="div"; return discover(); }
+        hiddenDivorce(); }],
+      ["このまま夫婦でいる",()=>{ st.log.push("何も言わなかった。"); wNext(); }]
+    ]}; return true; }
   return false;
 }
-function hiddenDivorce(){
+function hiddenDivorce(hAff){
   const st=S.st, b=st.base, T=st.year, kids=stKids().filter(k=>k.age<18).sort((a,c)=>c.age-a.age);
   const assets=r10(Math.max(0,st.assets)); const hs=b.assets>0?b.hAssets/b.assets:.6;
-  S.fam={...b,years:T,kids,assets,hAssets:r10(assets*hs),hidden:true,custody:b.style==="主夫"?"夫":"妻",proc:"協議",extra:st.extra||0,fight:null,stay:false};
+  S.fam={...b,years:T,kids,assets,hAssets:r10(assets*hs),hidden:true,hAff:!!hAff,custody:b.style==="主夫"?"夫":"妻",proc:"協議",extra:st.extra||0,fight:null,stay:false};
   S.path=["hidden"]; S.res=calc(S.fam,S.scenario); S.step=0; viewSettle();
 }
 function sureEvent(k){ const st=S.st;
@@ -813,7 +829,7 @@ const SEPTXT={me:{lost:"別居の話し合いは、まとまらなかった。�
 function stKids(){ const st=S.st; return st.kids.filter(k=>k.by<=st.year).map(k=>({age:st.year-k.by,fake:k.fake})); }
 function nextYear(){
   const st=S.st, meH=S.scenario==="wife"; st.year++; st.ev=null;
-  { const nk=st.kids.filter(k=>k.by<=st.year&&st.year-k.by<18).length, a0=st.assets; st.assets=Math.max(0,st.assets+st.save-KIDCOST*nk); st.dA=st.assets-a0; st.nk=nk; }
+  { const nk=st.kids.filter(k=>k.by<=st.year&&st.year-k.by<18).length, a0=st.assets; st.assets=Math.max(Math.min(0,st.assets),st.assets+st.save-KIDCOST*nk); if(R()<.0001){ st.assets+=1000; st.log.push("宝くじが当たった。1,000万円を手に入れた。"); } st.dA=st.assets-a0; st.nk=nk; }
   const born=st.kids.filter(k=>k.by===st.year);
   const ord=["一","二","三"];
   born.forEach(k=>{ const n=st.kids.indexOf(k); st.log.push(`${ord[n]}人目の子が生まれた。`); if(meH&&st.knows) st.log.push(k.fake?"こっそり調べた。この子も、自分の子ではなかった。":"こっそり調べた。この子は、自分の子だった。"); });
@@ -823,10 +839,11 @@ function nextYear(){
     st.bizYear=st.bizYear||rint(3,15);
     if(st.year===st.bizYear && R()<.03){ const g=R();
       if(g<.3){ st.base.h=Math.min(3000,r10(h0*5)); st.assets+=2000; st.biz="win"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大成功した。年収は ${man(h0)} から ${man(st.base.h)} に。貯金も2,000万円ふえた。`); ch=true; }
-      else { st.base.h=r10(h0*.5); st.assets=0; st.biz="lose"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大失敗した。貯金をすべて失い、年収は ${man(h0)} から ${man(st.base.h)} に下がった。`); ch=true; }
+      else if(R()<.2){ st.base.h=r10(h0*.5); st.assets=Math.min(st.assets,0)-1000; st.biz="lose"; if(!meH) st.chanceWhy="夫の会社がつぶれて、借金が残った。"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大失敗した。貯金をすべて失い、借金1,000万円を背負った。年収は ${man(h0)} から ${man(st.base.h)} に下がった。`); ch=true; }
+      else { st.base.h=r10(h0*.7); st.assets=Math.round(Math.max(0,st.assets)*.5); st.biz="lose"; if(!meH) st.chanceWhy="夫の起業が失敗した。"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。失敗した。貯金の半分を失い、年収は ${man(h0)} から ${man(st.base.h)} に下がった。`); ch=true; }
     }
     if(ch){} else if(d===5 && R()<.2){ st.base.h=r10(h0*1.2); st.log.push(`${meH?"":"夫が"}転職した。年収が ${man(h0)} から ${man(st.base.h)} に上がった。`); ch=true; }
-    else if((d===3||d===8) && R()<.05){ st.ill=true; st.base.h=r10(h0*.3); st.log.push(`${meH?"病気でたおれた。":"夫が病気でたおれた。"}働けなくなり、収入は手当と年金だけになった（年 ${man(h0)} → ${man(st.base.h)}）。`); ch=true; }
+    else if((d===3||d===8) && R()<.05){ st.ill=true; if(!meH) st.chanceWhy="夫が病気で働けなくなった。"; st.base.h=r10(h0*.3); st.log.push(`${meH?"病気でたおれた。":"夫が病気でたおれた。"}働けなくなり、収入は手当と年金だけになった（年 ${man(h0)} → ${man(st.base.h)}）。`); ch=true; }
     if(ch) st.save=Math.round((takeHome(st.base.h)+takeHome(st.base.w))*st.rate); }
   if(st.year>=st.end) return (meH&&st.knows)?endPretend():viewNever();
   if(!meH && wifeChain()) return viewYear();
@@ -874,8 +891,8 @@ function viewYear(){
   <div class="bigp num" style="font-size:2.2rem">結婚 <span class="yearnum">${st.year}</span>年目</div>
   <div><div class="yearbar"><i id="ybar" style="width:${Math.max(0,st.year-1)/st.end*100}%"></i>${st.kids.filter(k=>k.by<=st.year).map(k=>`<b style="left:${k.by/st.end*100}%"></b>`).join("")}</div><div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--sub)"><span>結婚</span><span>たて線＝子どもが生まれた年</span><span>${st.end}年目</span></div></div>
   <div class="pxrow" aria-hidden="true" style="min-height:64px">${px("husband",64)}${px("wife",64)}${kids.map(k=>px("kid",28+Math.min(k.age,17)*1.6|0)).join("")}</div>
-  <div style="font-size:.85rem;color:var(--sub)">子ども ${kids.length}人${kids.length?"（"+kids.map(k=>k.age+"歳").join("・")+"）":""}<br>夫：${st.base.style==="主夫"?"主夫":st.ill?"病気で休んでいる":st.biz==="win"?"社長":st.biz?"自営業":"会社員"}（年収 ${man(st.base.h)}・手取り 約${man(takeHome(st.base.h))}）　妻：${wJobOf(st.base)}（${st.base.w>0?`年収 ${man(st.base.w)}・手取り 約${man(takeHome(st.base.w))}`:"収入なし"}）<br>手取り＝税金と保険料を引いたあと。貯金は手取りから増える。</div>
-  <div style="font-size:.95rem;font-weight:700">貯金 <span class="num" style="font-size:1.25rem">${man(Math.round(st.assets))}</span>　<span style="font-weight:400;font-size:.8rem;color:var(--sub)">今年 ${st.dA>=0?"＋":"−"}${man(Math.abs(Math.round(st.dA)))}${st.nk?`（子育て費 −${man(KIDCOST*st.nk)}）`:""}</span></div>
+  <div style="font-size:.85rem;color:var(--sub)">子ども ${kids.length}人${kids.length?"（"+kids.map(k=>k.age+"歳").join("・")+"）":""}<br>夫：${st.base.style==="主夫"?"主夫":st.ill?"病気で休んでいる":st.biz==="win"?"社長":"会社員"}（年収 ${man(st.base.h)}・手取り 約${man(takeHome(st.base.h))}）　妻：${wJobOf(st.base)}（${st.base.w>0?`年収 ${man(st.base.w)}・手取り 約${man(takeHome(st.base.w))}`:"収入なし"}）<br>手取り＝税金と保険料を引いたあと。貯金は手取りから増える。</div>
+  <div style="font-size:.95rem;font-weight:700">${st.assets<0?"借金":"貯金"} <span class="num" style="font-size:1.25rem">${man(Math.abs(Math.round(st.assets)))}</span>　<span style="font-weight:400;font-size:.8rem;color:var(--sub)">今年 ${st.dA>=0?"＋":"−"}${man(Math.abs(Math.round(st.dA)))}${st.nk?`（子育て費 −${man(KIDCOST*st.nk)}）`:""}</span></div>
   ${meH&&st.care?`<div style="font-size:.85rem;font-weight:700">育児への関わり ${"●".repeat(Math.min(st.care,6))}${"○".repeat(Math.max(0,6-st.care))}</div>`:""}
   ${!meH&&st.year>st.firstFake?`<div><div style="font-size:.85rem;font-weight:700">夫の疑い ${Math.round(st.sus)}%</div><div style="height:12px;border:2px solid var(--ink)"><div style="height:100%;width:${Math.min(100,st.sus)}%;background:var(--stamp)"></div></div></div>`:""}
   <div class="sheet" style="${ev?"padding:.6rem .9rem":"min-height:9.5rem"}"><ul class="lines" style="margin:0">${log.map((l,i)=>`<li class="${i>=log.length-nNew?"new":""}" style="${i>=log.length-nNew?"":"opacity:.6"}">${esc(l)}</li>`).join("")}</ul>${st.log.length>log.length?`<details style="margin-top:.4rem"><summary style="cursor:pointer;font-size:.8rem;text-decoration:underline">これまでの出来事を全部見る</summary><ul class="lines" style="margin:.3rem 0 0;font-size:.85rem">${st.log.map(l=>`<li>${esc(l)}</li>`).join("")}</ul></details>`:""}</div>
@@ -1157,7 +1174,7 @@ function viewVerdict(){
     if(r.mo>0) lines.push(f.proc==="調停"?`妻に離婚を引き延ばされ、決着まで約${r.mo}か月かかった。`:`妻が離婚を拒み、裁判で決着するまで約${r.mo}か月かかった。`);
     if(r.hPays>0) lines.push(`托卵した妻に、財産の半分として ${man(r.hPays)} を渡した。`);
   } else {
-    lines.push(r.hidden?"托卵をかくしたまま、離婚した。慰謝料は0円。夫は、他人の子の養育費を払いつづける。":`夫に慰謝料 ${man(r.isha)} を払う。`);
+    lines.push(r.hidden&&r.hAff?"夫の浮気を理由に、離婚した。夫から慰謝料 150万円を受け取った。托卵はバレていない。":r.hidden?"托卵をかくしたまま、離婚した。慰謝料は0円。夫は、他人の子の養育費を払いつづける。":`夫に慰謝料 ${man(r.isha)} を払う。`);
     if(r.hidden) lines.push("この秘密は、一生かくし通さなければならない。");
     if(S.mode==="random"&&S.st&&S.st.affairs) lines.push(`不倫をした回数（物語の中で）：${S.st.affairs}回。`);
     if(r.mo>0) lines.push(f.proc==="調停"?`夫に調停を申し立てられ、決着まで約${r.mo}か月かかった。`:`夫に裁判を起こされ、決着まで約${r.mo}か月かかった。`);
@@ -1175,7 +1192,7 @@ function viewVerdict(){
     <span style="font-weight:700;border:2px solid var(--ink);padding:.15rem .6rem;align-self:flex-start">※ この金額は目安です</span>
     <span class="lead" style="font-size:1.25rem;color:var(--ink);font-weight:700">${r.pretend?"気づかないふりをした":r.stay?"離婚はしなかった":r.supFromMe>0?`毎月の養育費 ${yen(r.supMonth)} を払う（下の子が20歳になるまで${r.supYears}年）`:r.supToMe>0?`毎月の養育費 ${yen(r.supMonth)} を受け取る（下の子が20歳になるまで${r.supYears}年）`:"養育費のやりとりはなし"}</span>
     <div class="rows num">
-      ${r.pretend?"":`<span>慰謝料${r.stay?"（浮気相手から）":""}</span><span>${r.hidden?"0円":(meH?"＋":"−")+man(r.isha)}</span>`}
+      ${r.pretend?"":`<span>慰謝料${r.stay?"（浮気相手から）":""}</span><span>${r.hidden?(r.hAff?"＋"+man(150):"0円"):(meH?"＋":"−")+man(r.isha)}</span>`}
       ${r.stay?"":`<span>財産分与</span><span>${sign(meH?-r.hPays:r.hPays)}${man(Math.abs(r.hPays))}</span>`}
             ${r.konMe?`<span>婚姻費用（離婚までの${r.mo}か月）</span><span>${r.konMe>0?"＋":"−"}${man(Math.abs(r.konMe))}</span>`:""}
       <span>手続きの費用</span><span>−${man(r.cost)}</span>
