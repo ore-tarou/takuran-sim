@@ -571,7 +571,7 @@ function viewTitle(){
   <h1 class="title">托卵離婚<br>シミュレーター</h1>
   <p style="margin:0;font-weight:700;font-size:1.1rem">子どもが、じつは夫の子ではなかった。<br>その夫婦の人生を、1年ずつ進めるゲーム。</p>
   <p style="margin:0;font-size:.9rem">もし子どもの1%が托卵なら、日本でいま約15万人。子どものいる家の、およそ60軒に1軒。</p>
-  <p style="margin:.6rem 0 0;font-weight:700">どちらの人生であそぶ？</p>
+  <p style="margin:.6rem 0 0;font-weight:700">どちらの人生を選ぶ？</p>
   <div class="choices" role="group" aria-label="どちらであそびますか">
     <button class="choice" data-sc="wife"><span class="pxrow">${px("husband",56)}<span class="big">夫であそぶ</span></span><span class="who">妻のうそに、気づけるか。</span></button>
     <button class="choice" data-sc="me"><span class="pxrow">${px("wife",56)}<span class="big">妻であそぶ</span></span><span class="who">秘密を、かくし通せるか。</span></button>
@@ -856,7 +856,7 @@ function discover(conf,quiet){
 }
 function viewYear(){
   const st=S.st, meH=S.scenario==="wife", kids=stKids(), ev=st.ev;
-  const log=st.log.slice(ev?-3:-5);
+  const nNew=Math.max(1,Math.min(st.log.length,st.log.length-(st.seen||0))); const log=st.log.slice(-Math.max(ev?3:5,nNew+(ev?0:2))); const newChars=st.log.slice(-nNew).join("").length; st.seen=st.log.length;
   app.innerHTML=`
   <div style="display:flex;justify-content:space-between;align-items:center"><button class="backbtn" id="quit" style="padding:.25rem .6rem;font-size:.85rem">← やめる</button><span style="font-size:.8rem;color:var(--sub)">${meH?"あなた＝夫":"あなた＝妻"}</span></div>
   <div class="bigp num" style="font-size:2.2rem">結婚 <span class="yearnum">${st.year}</span>年目</div>
@@ -866,17 +866,17 @@ function viewYear(){
   <div style="font-size:.95rem;font-weight:700">貯金 <span class="num" style="font-size:1.25rem">${man(Math.round(st.assets))}</span>　<span style="font-weight:400;font-size:.8rem;color:var(--sub)">今年 ${st.dA>=0?"＋":"−"}${man(Math.abs(Math.round(st.dA)))}${st.nk?`（子育て費 −${man(KIDCOST*st.nk)}）`:""}</span></div>
   ${meH&&st.care?`<div style="font-size:.85rem;font-weight:700">育児への関わり ${"●".repeat(Math.min(st.care,6))}${"○".repeat(Math.max(0,6-st.care))}</div>`:""}
   ${!meH&&st.year>st.firstFake?`<div><div style="font-size:.85rem;font-weight:700">夫の疑い ${Math.round(st.sus)}%</div><div style="height:12px;border:2px solid var(--ink)"><div style="height:100%;width:${Math.min(100,st.sus)}%;background:var(--stamp)"></div></div></div>`:""}
-  <div class="sheet" style="${ev?"padding:.6rem .9rem":"min-height:9.5rem"}"><ul class="lines" style="margin:0">${log.map((l,i)=>`<li class="${i===log.length-1?"new":""}" style="${i===log.length-1?"":"opacity:.6"}">${esc(l)}</li>`).join("")}</ul></div>
+  <div class="sheet" style="${ev?"padding:.6rem .9rem":"min-height:9.5rem"}"><ul class="lines" style="margin:0">${log.map((l,i)=>`<li class="${i>=log.length-nNew?"new":""}" style="${i>=log.length-nNew?"":"opacity:.6"}">${esc(l)}</li>`).join("")}</ul>${st.log.length>log.length?`<details style="margin-top:.4rem"><summary style="cursor:pointer;font-size:.8rem;text-decoration:underline">これまでの出来事を全部見る</summary><ul class="lines" style="margin:.3rem 0 0;font-size:.85rem">${st.log.map(l=>`<li>${esc(l)}</li>`).join("")}</ul></details>`:""}</div>
   ${ev?`<div class="fact ${(ev.clue||/夫の子じゃない|知っています|話す」|通報|産みましたよね|くつのあと|見たあと|否認はできない|期限|産むなら離婚|かくしてないか|似てない|妊娠した/.test(ev.t))?"bad":""}"><span class="factlabel">${(ev.clue||/夫の子じゃない|知っています|話す」|通報|産みましたよね|くつのあと|見たあと|否認はできない|期限|産むなら離婚|かくしてないか|似てない|妊娠した/.test(ev.t))?"！ 起きたこと":"起きたこと"}</span><div style="font-family:var(--display);font-weight:800;font-size:1.3rem;line-height:1.4">${esc(ev.t)}</div></div>
   <div style="font-weight:700;font-size:.9rem">▼ どうする？（選ぶ）</div>
   <div class="pick">${meH&&!ev.opts
     ?(ev.clue?`<button class="choice" id="ea"><span class="big">気にしない</span></button><button class="choice" id="eb"><span class="big">こっそりDNA鑑定</span><span class="who">3万円かかる</span></button>`:`<button class="choice" id="ea"><span class="big">${esc(ev.a[0])}</span></button><button class="choice" id="eb"><span class="big">${esc(ev.b[0])}</span></button>`)
     :ev.opts?ev.opts.map((o,i)=>`<button class="choice" data-o="${i}"><span class="big" style="font-size:1.3rem">${esc(o[0])}</span></button>`).join(""):`<button class="choice" id="ea"><span class="big">${esc(ev.a[0])}</span></button><button class="choice" id="eb"><span class="big">${esc(ev.b[0])}</span></button>`}</div>`
-  :`<div class="next" style="align-items:center"><button class="ghost" id="ny">早送り ▶▶</button><span style="font-size:.8rem;color:var(--sub)">時間は自動で進みます</span></div>`}`;
+  :`<div class="next" style="align-items:center"><button class="ghost" id="pz" style="font-weight:700">${S.paused?"▶ 時間を動かす":"⏸ 時間を止める"}</button><button class="ghost" id="ny">${S.paused?"次の年へ ▶":"早送り ▶▶"}</button></div><div style="font-size:.8rem;color:var(--sub)">${S.paused?"時間は止まっています":"時間は自動で進みます"}</div>`}`;
   $("#quit").onclick=()=>{ clearTimeout(S.tick); viewTitle(); };
   clearTimeout(S.tick);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ const yb=$("#ybar"); if(yb) yb.style.width=(st.year/st.end*100)+"%"; }));
-  const ny=$("#ny"); if(ny){ const go=()=>{ clearTimeout(S.tick); if($("#ny")) stay(nextYear); }; ny.onclick=go; S.tick=setTimeout(go,1400); }
+  const ny=$("#ny"); if(ny){ const go=()=>{ clearTimeout(S.tick); if($("#ny")) stay(nextYear); }; ny.onclick=go; if(!S.paused) S.tick=setTimeout(go,Math.min(7000,1500+newChars*60)); $("#pz").onclick=()=>{ S.paused=!S.paused; clearTimeout(S.tick); st.seen=st.log.length-nNew; viewYear(); }; const dt=app.querySelector(".sheet details"); if(dt) dt.addEventListener("toggle",()=>{ if(dt.open && !S.paused){ S.paused=true; clearTimeout(S.tick); $("#pz").textContent="▶ 時間を動かす"; $("#ny").textContent="次の年へ ▶"; } }); }
   const after=()=>{ st.ev=null; if(st.year>=st.end) viewNever(); else stay(viewYear); };
   if(ev && ev.opts){
     app.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>ev.opts[+b.dataset.o][1]());
