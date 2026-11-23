@@ -6,12 +6,12 @@
 <meta name="description" content="托卵が発覚したら、お金と子どもはどうなる？ 慰謝料・財産分与・養育費・親権を、日本の法律と統計で計算するゲーム。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="托卵離婚シミュレーター">
-<meta property="og:description" content="托卵が発覚したら、お金と子どもはどうなる？ 慰謝料・財産分与・養育費・親権を、日本の法律と統計で計算するゲーム。">
+<meta property="og:description" content="妻が托卵していた！ 夫でも妻でも遊べる。結婚から最大30年、選び方でお金と子どもの行き先が変わる物語ゲーム。">
 <meta property="og:url" content="https://ore-tarou.github.io/takuran-sim/">
-<meta property="og:image" content="https://ore-tarou.github.io/takuran-sim/ogp.png">
+<meta property="og:image" content="https://ore-tarou.github.io/takuran-sim/ogp2.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="托卵離婚シミュレーター">
-<meta name="twitter:image" content="https://ore-tarou.github.io/takuran-sim/ogp.png">
+<meta name="twitter:image" content="https://ore-tarou.github.io/takuran-sim/ogp2.png">
 <title>托卵離婚シミュレーター</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=BIZ+UDPGothic:wght@400;700&display=swap">
@@ -643,16 +643,16 @@ const KIDFLAVOR=[[1,"はじめて歩いた。"],[2,"「パパ」と言った。"
 const CLUES=["妻がスマホを、いつも伏せて置くようになった。","親戚に「この子、誰にも似てないね」と言われた。","血液型の話になると、妻が急に話をそらした。","妻の帰りが遅い日が、ときどきある。","子どもの耳の形が、自分とも妻とも違う気がする。","妻が、知らない男の名前で寝言を言った。","子どもが生まれた日から逆算すると、あの月は出張で家にいなかった。","妻のスマホに、知らない男からの着信が残っていた。","母子手帳を見ようとしたら、妻があわてて取り上げた。","子どもの写真を見た同僚が「奥さん似だね。……パパには？」と言った。","妻が、昔の職場の飲み会にだけは必ず出かける。","子どもがくせ毛だ。自分にも妻にも、親にもいない。","妻の実家で、義母が何か言いかけてやめた。","テレビで托卵のニュースが流れた。妻がだまってチャンネルを変えた。","ネットで「父親に似ていない子」という記事を読んでしまった。","子どもが「ママのお友だちのおじさんに会ったよ」と言った。"];
 // 夫：ふつうの出来事。育児にどれだけ関わったかは、あとで親権の見込みに効く
 const HEV=[
- {m:1,t:"子どもが熱を出した。保育園から電話がきた。",a:["会社を早退して迎えに行く",1,"早退して迎えに行った。"],b:["妻に任せる",0,"妻に任せて、仕事にもどった。"]},
- {t:"上司に、育休を取るか聞かれた。",a:["育休を取る",2,"育休を取った。おむつ替えがうまくなった。"],b:["取らない",0,"育休は取らなかった。"]},
- {t:"転勤のない部署に移れる話がきた。給料は少し下がる。",a:["移る（家にいる時間がふえる）",1,"部署を移った。夕飯を家族で食べる日がふえた。"],b:["断る",0,"今の部署に残った。"]},
- {m:6,t:"授業参観の日が、大事な会議と重なった。",a:["参観に行く",1,"授業参観に行った。子どもが何度もふり返った。"],b:["会議に出る",0,"会議に出た。参観は妻が行った。"]},
- {m:1,t:"毎朝の保育園の送りを、どちらがやるか話し合った。",a:["自分がやる",1,"毎朝、子どもを送ってから出勤するようになった。"],b:["妻にお願いする",0,"送りは妻がやることになった。"]},
- {m:2,t:"休日。つかれているが、子どもが「公園に行きたい」と言う。",a:["公園に連れて行く",1,"公園で日が暮れるまで遊んだ。"],b:["寝て過ごす",0,"昼まで寝ていた。"]},
- {m:3,t:"子どもの弁当を、週に何日か作らないかと妻に言われた。",a:["作る",1,"弁当作りをはじめた。卵焼きがこげた。"],b:["無理だと断る",0,"弁当は妻が作りつづけた。"]},
- {m:6,t:"PTAの役員決め。だれも手をあげない。",a:["自分が手をあげる",1,"PTAの役員になった。"],b:["下を向く",0,"下を向いているうちに、だれかに決まった。"]}
+ {m:1,M:5,w:1,t:"子どもが熱を出した。保育園から電話がきた。",a:["会社を早退して迎えに行く",1,"早退して迎えに行った。"],b:["妻に任せる",0,"妻に任せて、仕事にもどった。"]},
+ {m:0,M:0,w:1,t:"上司に、育休を取るか聞かれた。",a:["育休を取る",2,"育休を取った。おむつ替えがうまくなった。"],b:["取らない",0,"育休は取らなかった。"]},
+ {w:1,t:"転勤のない部署に移れる話がきた。給料は少し下がる。",a:["移る（家にいる時間がふえる）",1,"部署を移った。夕飯を家族で食べる日がふえた。"],b:["断る",0,"今の部署に残った。"]},
+ {m:6,M:12,w:1,t:"授業参観の日が、大事な会議と重なった。",a:["参観に行く",1,"授業参観に行った。子どもが何度もふり返った。"],b:["会議に出る",0,"会議に出た。参観は妻が行った。"]},
+ {m:1,M:5,w:1,t:"毎朝の保育園の送りを、どちらがやるか話し合った。",a:["自分がやる",1,"毎朝、子どもを送ってから出勤するようになった。"],b:["妻にお願いする",0,"送りは妻がやることになった。"]},
+ {m:2,M:9,t:"休日。つかれているが、子どもが「公園に行きたい」と言う。",a:["公園に連れて行く",1,"公園で日が暮れるまで遊んだ。"],b:["寝て過ごす",0,"昼まで寝ていた。"]},
+ {m:3,M:5,t:"子どもの弁当を、週に何日か作らないかと妻に言われた。",a:["作る",1,"弁当作りをはじめた。卵焼きがこげた。"],b:["無理だと断る",0,"弁当は妻が作りつづけた。"]},
+ {m:6,M:12,t:"PTAの役員決め。だれも手をあげない。",a:["自分が手をあげる",1,"PTAの役員になった。"],b:["下を向く",0,"下を向いているうちに、だれかに決まった。"]}
 ];
-const HFOUND=["子どもがけがをして、病院で血液型を調べた。夫婦からは生まれない型だった。","妻のスマホの通知が見えた。「あの子、俺に似てきたな」。","子どもの学校の遺伝の宿題で、血液型が合わないことに気づいた。","知らない男が家に来て、「自分の子に会わせてほしい」と言った。","妻が酔って、口をすべらせた。"];
+const HFOUND=["子どもがけがをして、病院で血液型を調べた。夫婦からは生まれない型だった。","妻のスマホの通知が見えた。「あの子、俺に似てきたな」。","子どもの学校の遺伝の宿題で、血液型が合わないことに気づいた。","妻の引き出しの奥から、知らない男が赤ん坊をだいている写真が出てきた。","子どもの病気で、親子の遺伝の検査を受けた。自分とは、つながっていなかった。"];
 // 妻：出来事。数字は夫の疑いの増減
 const WEV=[
  {t:"彼（子の本当の父）から「会いたい」と連絡がきた。",a:["会いに行く",18],b:["もう会わない",-6]},
@@ -661,13 +661,13 @@ const WEV=[
  {t:"夫のスマホに、DNA鑑定のサイトを見たあとがあった。",a:["知らないふりをする",14],b:["自分から打ち明ける","confess"]},
  {t:"子どもの寝顔を見ていたら、罪悪感で眠れなくなった。",a:["黙っている",0],b:["自分から打ち明ける","confess"]},
  {t:"彼が「子どもに会わせてほしい」と言ってきた。",a:["一度だけ会わせる",20],b:["断る",4]},
- {t:"子どもが成長して、彼に顔が似てきた。",a:["髪型を変えてごまかす",-4],b:["何もしない",10]},
+ {m:3,t:"子どもが成長して、彼に顔が似てきた。",a:["髪型を変えてごまかす",-4],b:["何もしない",10]},
  {t:"夫が、子どもの母子手帳を見たがっている。",a:["見せる",6],b:["「なくした」と言う",14]},
  {t:"彼から、養育費のつもりだというお金が振り込まれた。",a:["受け取る",12],b:["送り返して、連絡を断つ",-5]},
- {t:"ママ友に「旦那さんに似てないね」と言われた。夫もその場にいた。",a:["「私の父に似たの」と言う",3],b:["固まってしまう",15]},
+ {m:1,t:"ママ友に「旦那さんに似てないね」と言われた。夫もその場にいた。",a:["「私の父に似たの」と言う",3],b:["固まってしまう",15]},
  {t:"夫が、家族みんなで健康診断を受けようと言い出した。",a:["血液型の検査だけ外してもらう",8],b:["そのまま受ける","gamble"]},
  {t:"彼が、近所に引っ越してきた。",a:["会わないと決める",6],b:["ときどき会う",22]},
- {t:"子どもが「どうして自分だけ、くせ毛なの？」と聞いてきた。夫が聞いている。",a:["「おじいちゃんに似たのよ」",4],b:["話を変える",9]},
+ {m:4,t:"子どもが「どうして自分だけ、くせ毛なの？」と聞いてきた。夫が聞いている。",a:["「おじいちゃんに似たのよ」",4],b:["話を変える",9]},
  {t:"夫が「最近、何かかくしてないか」と聞いてきた。",a:["「何も」と笑う",10],b:["自分から打ち明ける","confess"]},
  {t:"スマホに残った、彼とのやりとり。",a:["全部消す",-8],b:["消せない",12]},
  {t:"夫が育児をよく手伝ってくれるようになった。",a:["すなおに甘える",-3,"care"],b:["自分でやると言う",2]}
@@ -689,25 +689,25 @@ const MEET=[["同窓会で、元彼に再会した。","元彼"],["駅で、元�
  ["通いはじめたスポーツジムで、やさしい人に出会った。","ジムの彼","専業主婦"],["子どもの習いごとで、よその家のお父さんと仲良くなった。","あのお父さん","専業主婦"],["昼間、家に来た営業の人と、話がはずんだ。","営業の彼","専業主婦"],["マンションのとなりに、感じのいい人が越してきた。","となりの人","専業主婦"],
  ["パート先の店長が、よく相談に乗ってくれる。","店長","パート"],["パート先に、毎日来る常連さんがいる。目が合うと笑ってくれる。","常連さん","パート"],["パート先に、年下のアルバイトが入ってきた。","バイトの彼","パート"],
  ["職場に、話の合う同僚が異動してきた。","同僚","正社員"],["残業のあと、上司にごはんに誘われた。","上司","正社員"],["取引先の担当が、やさしい人だった。","取引先の彼","正社員"],["出張先で、同期と二人で飲みに行った。","同期","正社員"]];
-const AFFAIRJOB={専業主婦:["夫が会社にいる昼間に、不倫をした。","子どもが幼稚園に行っているあいだに、不倫をした。","買い物に行くと言って、不倫をした。"],パート:["シフトが終わったあと、不倫をした。","「今日は遅番」とうそをついて、不倫をした。","パートを休んで、不倫をした。"],正社員:["残業だとうそをついて、不倫をした。","出張先で、不倫をした。","会社の飲み会のあと、不倫をした。","有休を取って、不倫をした。"]};
-const AFFAIR=["不倫をした。","また、不倫をした。","夫が出張の夜、不倫をした。","子どもを実家にあずけて、不倫をした。","「これで最後」と言いながら、不倫をした。","昼間のホテルで、不倫をした。","夫の誕生日の前の日に、不倫をした。","結婚記念日の次の日に、不倫をした。","彼とは別の人とも、不倫をした。","やめようと思っていたのに、不倫をした。","PTAの集まりだとうそをついて、不倫をした。","夫が子どもを風呂に入れているあいだ、彼に返信した。そして週末、不倫をした。"];
+const AFFAIRJOB={専業主婦:["夫が会社にいる昼間に、不倫をした。","子どもを一時保育にあずけて、不倫をした。","買い物に行くと言って、不倫をした。"],パート:["シフトが終わったあと、不倫をした。","「今日は遅番」とうそをついて、不倫をした。","パートを休んで、不倫をした。"],正社員:["残業だとうそをついて、不倫をした。","出張先で、不倫をした。","会社の飲み会のあと、不倫をした。","有休を取って、不倫をした。"]};
+const AFFAIR=["不倫をした。","また、不倫をした。","夫が出張の夜、不倫をした。","子どもを実家にあずけて、不倫をした。","「これで最後」と言いながら、不倫をした。","昼間のホテルで、不倫をした。","夫の誕生日の前の日に、不倫をした。","結婚記念日の次の日に、不倫をした。","彼とは別の人とも、不倫をした。","やめようと思っていたのに、不倫をした。","美容院に行くとうそをついて、不倫をした。","夫が子どもを風呂に入れているあいだ、彼に返信した。そして週末、不倫をした。"];
 (function(){ const st=()=>S.st, say=t=>S.st.log.push(t), pay=n=>{ S.st.extra=(S.st.extra||0)+n; };
  const found=t=>{ say(t); discover(); };
  WEV.push(
  {job:"専業主婦",t:"昼間、夫のいない家に、彼を呼ぶ？",a:["家に呼ぶ",()=>{ st().sus+=16; st().cut=false; say("彼を家に上げた。夫の歯ブラシのとなりに、彼が立っていた。"); wNext(); }],b:["外で会う",()=>{ st().sus+=7; st().cut=false; say("となり町の喫茶店で会った。"); wNext(); }]},
  {job:"専業主婦",t:"夫のカードで、彼へのプレゼントを買ってしまった。夫が明細を見ている。",a:["「自分へのごほうび」と言う",()=>{ st().sus+=8; say("夫は「ふうん」とだけ言った。"); wNext(); }],b:["へそくりで穴うめして、明細をかくす",()=>{ pay(3); st().sus+=2; say("明細を、こっそりシュレッダーにかけた。"); wNext(); }]},
  {job:"専業主婦",t:"夫が「昼間、だれか来てた？」と聞いてきた。玄関に、知らないくつのあとがある。",a:["「宅配の人よ」",()=>{ st().sus+=9; say("夫は、玄関をもう一度見た。"); wNext(); }],b:["「母が来てたの」",()=>{ if(R()<.35){ st().sus+=22; say("夫が、義母に電話でお礼を言ってしまった。うそがバレた。"); } else { st().sus+=3; say("夫は納得したようだった。"); } wNext(); }]},
- {job:"パート",t:"店長に言われた。「シフト、俺と同じ日にしないか」。",a:["同じ日にする",()=>{ st().sus+=10; st().cut=false; say("シフトを、彼と同じ日にそろえた。"); wNext(); }],b:["今のままにする",()=>{ st().sus=Math.max(0,st().sus-3); say("シフトは変えなかった。"); wNext(); }]},
- {job:"パート",t:"パート仲間に言われた。「あの人と、ずいぶん仲いいよね」。",a:["笑ってごまかす",()=>{ st().sus+=6; say("休けい室が、少し静かになった。"); wNext(); }],b:["パートをやめる",()=>{ st().cut=true; st().sus=Math.max(0,st().sus-6); say("パートをやめた。夫には「人間関係がきつくて」と言った。"); wNext(); }]},
- {job:"パート",t:"夫が、パート先にむかえに来た。彼がレジに立っている。",a:["ふつうに紹介する",()=>{ st().sus+=5; say("「いつも妻がお世話になってます」と、夫は彼に頭を下げた。"); wNext(); }],b:["いそいで店を出る",()=>{ st().sus+=11; say("夫は「あの人、だれ？」と二回聞いた。"); wNext(); }]},
- {job:"正社員",t:"彼と、二人きりの出張が決まった。一泊。",a:["行く",()=>{ st().sus+=12; st().cut=false; st().affairs=(st().affairs||0)+1; say("出張先のホテルで、不倫をした。"); wNext(); }],b:["同僚に代わってもらう",()=>{ st().sus=Math.max(0,st().sus-4); say("出張を代わってもらった。彼は不満そうだった。"); wNext(); }]},
- {job:"正社員",t:"社内で、彼とのうわさが立っている。",a:["気にしない",()=>{ st().sus+=10; say("うわさは、夫の知り合いの耳にも入ったらしい。"); wNext(); }],b:["部署の異動を願い出る",()=>{ st().cut=true; st().sus=Math.max(0,st().sus-5); say("異動した。彼とは、顔を合わせなくなった。"); wNext(); }]},
- {job:"正社員",t:"会社の飲み会の帰り。夫が車でむかえに来た。となりに彼がいる。",a:["「同僚よ」と紹介する",()=>{ st().sus+=6; say("夫は彼と握手をした。帰りの車は静かだった。"); wNext(); }],b:["彼からはなれて歩く",()=>{ st().sus+=3; say("彼は、何も言わずに駅へ歩いていった。"); wNext(); }]},
- {job:"正社員",t:"人事から呼び出された。「社内不倫の通報がありました」。",a:["みとめない",()=>{ if(R()<.3) return found("会社からの通知が、家に届いた。夫が先に開けた。"); st().sus+=6; say("証拠はなく、注意だけで終わった。"); wNext(); }],b:["みとめて、彼と別れる",()=>{ st().cut=true; st().sus+=4; say("始末書を書いた。彼とは別れた。"); wNext(); }]},
+ {job:"パート",him:["店長"],t:"店長に言われた。「シフト、俺と同じ日にしないか」。",a:["同じ日にする",()=>{ st().sus+=10; st().cut=false; say("シフトを、彼と同じ日にそろえた。"); wNext(); }],b:["今のままにする",()=>{ st().sus=Math.max(0,st().sus-3); say("シフトは変えなかった。"); wNext(); }]},
+ {job:"パート",him:["店長","常連さん","バイトの彼"],t:"パート仲間に言われた。「あの人と、ずいぶん仲いいよね」。",a:["笑ってごまかす",()=>{ st().sus+=6; say("休けい室が、少し静かになった。"); wNext(); }],b:["パートをやめる",()=>{ st().cut=true; st().sus=Math.max(0,st().sus-6); say("パートをやめた。夫には「人間関係がきつくて」と言った。"); wNext(); }]},
+ {job:"パート",him:["店長","バイトの彼"],t:"夫が、パート先にむかえに来た。彼がレジに立っている。",a:["ふつうに紹介する",()=>{ st().sus+=5; say("「いつも妻がお世話になってます」と、夫は彼に頭を下げた。"); wNext(); }],b:["いそいで店を出る",()=>{ st().sus+=11; say("夫は「あの人、だれ？」と二回聞いた。"); wNext(); }]},
+ {job:"正社員",him:["同僚","上司","同期"],t:"彼と、二人きりの出張が決まった。一泊。",a:["行く",()=>{ st().sus+=12; st().cut=false; st().affairs=(st().affairs||0)+1; say("出張先のホテルで、不倫をした。"); wNext(); }],b:["同僚に代わってもらう",()=>{ st().sus=Math.max(0,st().sus-4); say("出張を代わってもらった。彼は不満そうだった。"); wNext(); }]},
+ {job:"正社員",him:["同僚","上司","同期"],t:"社内で、彼とのうわさが立っている。",a:["気にしない",()=>{ st().sus+=10; say("うわさは、夫の知り合いの耳にも入ったらしい。"); wNext(); }],b:["部署の異動を願い出る",()=>{ st().cut=true; st().sus=Math.max(0,st().sus-5); say("異動した。彼とは、顔を合わせなくなった。"); wNext(); }]},
+ {job:"正社員",him:["同僚","上司","同期"],t:"会社の飲み会の帰り。夫が車でむかえに来た。となりに彼がいる。",a:["「同僚よ」と紹介する",()=>{ st().sus+=6; say("夫は彼と握手をした。帰りの車は静かだった。"); wNext(); }],b:["彼からはなれて歩く",()=>{ st().sus+=3; say("彼は、何も言わずに駅へ歩いていった。"); wNext(); }]},
+ {job:"正社員",him:["同僚","上司","同期"],t:"人事から呼び出された。「社内不倫の通報がありました」。",a:["みとめない",()=>{ if(R()<.3) return found("会社からの通知が、家に届いた。夫が先に開けた。"); st().sus+=6; say("証拠はなく、注意だけで終わった。"); wNext(); }],b:["みとめて、彼と別れる",()=>{ st().cut=true; st().sus+=4; say("始末書を書いた。彼とは別れた。"); wNext(); }]},
  {t:"彼の奥さんから電話がきた。「うちの夫の子を、産みましたよね」。",a:["あやまって、100万円をこっそり払う",()=>{ pay(100); st().sus+=5; say("へそくりから100万円を払った。彼の奥さんは、だまって受け取った。"); wNext(); }],b:["しらを切る",()=>{ if(R()<.5) return found("彼の奥さんが、夫の会社に手紙を送った。"); say("電話はそれきり、かかってこなかった。"); wNext(); }]},
  {t:"彼が言った。「50万、貸してくれ。断るなら、あの子が俺の子だと旦那に話す」。",a:["50万円をわたす",()=>{ pay(50); st().sus+=4; say("50万円をわたした。彼は「助かるよ」と笑った。"); wNext(); }],b:["断る",()=>{ if(R()<.4) return found("彼が、夫にすべてを話した。"); st().cut=true; say("断った。彼からの連絡は、とだえた。"); wNext(); }]},
  {t:"子どものことを、だれかに話してしまいたい。親友に相談する？",a:["相談する",()=>{ if(R()<.3) return found("親友が、夫にすべてを話した。"); st().sus+=3; say("親友は「墓場まで持っていきな」と言った。"); wNext(); }],b:["一人でかかえる",()=>{ say("だれにも言わなかった。"); wNext(); }]},
- {t:"彼が、子どもの運動会に来ていた。遠くからカメラを向けている。",a:["追い返す",()=>{ st().sus+=5; say("「二度と来ないで」と言った。夫が、こっちを見ていた。"); wNext(); }],b:["気づかないふりをする",()=>{ st().sus+=10; say("夫が「あの人、だれの父親だろう」と言った。"); wNext(); }]}
+ {m:4,t:"彼が、子どもの運動会に来ていた。遠くからカメラを向けている。",a:["追い返す",()=>{ st().sus+=5; say("「二度と来ないで」と言った。夫が、こっちを見ていた。"); wNext(); }],b:["気づかないふりをする",()=>{ st().sus+=10; say("夫が「あの人、だれの父親だろう」と言った。"); wNext(); }]}
  );
 })();
 function refreshFake(){ const st=S.st; const f=st.kids.filter(k=>k.fake).map(k=>k.by); st.firstFake=f.length?Math.min(...f):Infinity; st.end=f.length?Math.min(30,Math.max(...f)+18):Math.min(30,st.year+4); }
@@ -723,11 +723,11 @@ function wifeChain(){ // その年に起きる妻だけの出来事。あれば 
       ["子どもをおろす",()=>{ st.kids.splice(st.kids.indexOf(pre),1); refreshFake(); st.aborted=(st.aborted||0)+1; st.sus+=6; st.log.push("手術を受けた。夫には、体調が悪いとだけ言った。"); wNext(); }],
       ["夫に打ち明ける",()=>{ st.log.push("夫に、すべてを打ち明けた。");
         const r=R();
-        if(r<.55){ st.log.push("夫は何も言わずに家を出た。数日後、離婚を切り出された。子どもは、話し合いの最中に生まれた。"); st.year=pre.by; return discover(true); }
+        if(r<.55){ st.log.push("夫は何も言わずに家を出た。数日後、離婚を切り出された。子どもは、話し合いの最中に生まれた。"); st.year=pre.by; st.forceMode="div"; return discover(true); }
         if(r<.75){ st.log.push("夫は一言も話さなくなった。一週間後、弁護士から封筒が届いた。子どもは、調停の最中に生まれた。"); st.year=pre.by; st.forceProc="調停"; return discover(true); }
         if(r<.95){ st.ev={t:"夫は長いあいだ黙って、言った。「産むなら離婚だ。産まないなら、やり直す」。",opts:[
-            ["産む（離婚になる）",()=>{ st.log.push("産むと決めた。夫は離婚届を置いて出ていった。"); st.year=pre.by; discover(true); }],
-            ["おろして、やり直す",()=>{ st.kids.splice(st.kids.indexOf(pre),1); refreshFake(); st.aborted=(st.aborted||0)+1; st.sus=Math.max(st.sus,35); st.log.push("手術を受けた。夫はついてきてくれたが、手はつながなかった。"); wNext(); }]
+            ["産む（離婚になる）",()=>{ st.log.push("産むと決めた。夫は離婚届を置いて出ていった。"); st.year=pre.by; st.forceMode="div"; discover(true); }],
+            ["おろして、やり直す",()=>{ st.kids.splice(st.kids.indexOf(pre),1); refreshFake(); st.aborted=(st.aborted||0)+1; st.husKnows=true; const other=st.kids.some(k=>k.fake&&k.by<=st.year); st.sus=Math.max(st.sus,other?60:35); st.log.push("手術を受けた。夫はついてきてくれたが、手はつながなかった。"); if(other) st.log.push("夫は、上の子の顔をじっと見るようになった。"); wNext(); }]
           ]}; return stay(viewYear); }
         viewForgiven(); }]
     ]}; return true; }
@@ -738,7 +738,7 @@ function wifeChain(){ // その年に起きる妻だけの出来事。あれば 
       ["こっそりDNA鑑定をする",()=>{ b.sure=true; st.sus+=4; st.log.push("こっそりDNA鑑定をした。"); sureEvent(b); }],
       ["夫に打ち明ける",()=>{ st.log.push("「あなたの子じゃないかもしれない」と、夫に言った。"); discover(true); }]
     ]}; return true; }
-  const c=st.kids.find(k=>k.fake&&k.by===y-1&&!k.sure);
+  const c=st.kids.find(k=>k.fake&&k.by<=y-1&&!k.sure);
   if(c){ c.sure=true; st.log.push("子どもの血液型が分かった。"); sureEvent(c); return true; }
   const born=st.kids.filter(k=>k.fake&&k.by<=y), allBorn=st.kids.filter(k=>k.fake).every(k=>k.by<=y);
   if(born.length && !st.advised && !st.aiAsked && born.some(k=>y-k.by<3) && born.every(k=>k.sure) && R()<.5){ st.aiAsked=true;
@@ -749,14 +749,14 @@ function wifeChain(){ // その年に起きる妻だけの出来事。あれば 
   if(st.advised && !st.offered && allBorn && born.every(k=>y-k.by>=3)){ st.offered=true;
     st.ev={t:"いちばん下の托卵の子が、3歳になった。夫はもう、否認できない。",opts:[
       ["托卵をかくしたまま、離婚を切り出す",()=>{ st.log.push("「性格が合わない」と言って、離婚を切り出した。");
-        if(R()<.3){ st.log.push("夫は急な話をあやしんで、こっそりDNA鑑定をした。"); return discover(); }
+        if(R()<.3){ st.log.push("夫は急な話をあやしんで、こっそりDNA鑑定をした。"); st.forceMode="div"; return discover(); }
         hiddenDivorce(); }],
       ["このまま夫婦でいる",()=>{ st.log.push("何も言わなかった。"); wNext(); }]
     ]}; return true; }
   return false;
 }
 function hiddenDivorce(){
-  const st=S.st, b=st.base, T=st.year, kids=stKids().sort((a,c)=>c.age-a.age);
+  const st=S.st, b=st.base, T=st.year, kids=stKids().filter(k=>k.age<18).sort((a,c)=>c.age-a.age);
   const assets=r10(Math.max(0,T*st.save)); const hs=b.assets>0?b.hAssets/b.assets:.6;
   S.fam={...b,years:T,kids,assets,hAssets:r10(assets*hs),hidden:true,custody:b.style==="主夫"?"夫":"妻",proc:"協議",extra:st.extra||0,fight:null,stay:false};
   S.path=["hidden"]; S.res=calc(S.fam,S.scenario); S.step=0; viewSettle();
@@ -782,14 +782,21 @@ function viewForgiven(){
   <div class="next"><button class="go" id="again">もう一回あそぶ</button></div>`;
   $("#again").onclick=startStory; $("#top").onclick=viewTitle; toTop();
 }
+function flavor(){ const st=S.st, meH=S.scenario==="wife"; st.usedF=st.usedF||[];
+  let pool=FLAVOR.map((t,i)=>i).filter(i=>!st.usedF.includes(i) && !(st.base.style==="主夫"&&/昇進|仕事が忙しく/.test(FLAVOR[i])));
+  if(!pool.length){ st.usedF=[]; pool=[1,2,4,5,9,14,20]; }
+  const i=pool[rint(0,pool.length-1)]; st.usedF.push(i); let t=FLAVOR[i];
+  if(meH) t=t.replace(/^夫が/,"").replace(/^夫の父/,"父"); else t=t.replace(/^妻が/,"").replace(/^妻の手料理/,"手料理");
+  return t; }
 function stKids(){ const st=S.st; return st.kids.filter(k=>k.by<=st.year).map(k=>({age:st.year-k.by,fake:k.fake})); }
 function nextYear(){
   const st=S.st, meH=S.scenario==="wife"; st.year++; st.ev=null;
   const born=st.kids.filter(k=>k.by===st.year);
   const ord=["一","二","三"];
-  born.forEach(k=>{ const n=st.kids.indexOf(k); st.log.push(`${ord[n]}人目の子が生まれた。`); });
+  born.forEach(k=>{ const n=st.kids.indexOf(k); st.log.push(`${ord[n]}人目の子が生まれた。`); if(meH&&st.knows) st.log.push(k.fake?"こっそり調べた。この子も、自分の子ではなかった。":"こっそり調べた。この子は、自分の子だった。"); });
   if(!born.length){ const kf=[]; st.kids.forEach(k=>{ KIDFLAVOR.forEach(([a,t])=>{ if(st.year-k.by===a) kf.push(`${ord[st.kids.indexOf(k)]}人目の子（${a}歳）が、`+t); }); });
-    st.log.push(kf.length?kf[0]:FLAVOR[rint(0,FLAVOR.length-1)]); }
+    st.log.push(kf.length?kf[0]:flavor()); }
+  if(st.year>=st.end) return (meH&&st.knows)?endPretend():viewNever();
   if(!meH && wifeChain()) return viewYear();
   const secret=st.year>st.firstFake;
   if(meH && st.knows){
@@ -798,20 +805,20 @@ function nextYear(){
     const keep=t=>()=>{ st.log.push(t); st.ev=null; if(st.year>=st.end) endPretend(); else stay(viewYear); };
     if(young){ young.warned=true; st.ev={t:"托卵の子が、もうすぐ3歳になる。3歳を過ぎたら、もう否認はできない。",opts:[["いま動く",act],["このまま、自分の子として育てる",keep("誕生日のケーキを買って帰った。")]]}; }
     else if(kn===3 && !st.w3){ st.w3=true; st.ev={t:"知ってから3年。相手の男に慰謝料を請求できる期限が、もうすぐ切れる。",opts:[["いま動く",act],["見送る",keep("期限は過ぎた。相手の男に請求する権利は、消えた。")]]}; }
-    else if(R()<.5){ const e=KNOW[rint(0,KNOW.length-1)]; st.ev={t:e[0],opts:[[e[1],keep(e[2])],[e[3],e[4]==="act"?act:keep(e[4])]]}; }
+    else if(R()<.5){ const KA={0:[2,8],2:[3,9],5:[4,10],7:[11,17]}, fa=st.kids.filter(k=>k.fake&&k.by<=st.year).map(k=>st.year-k.by); const okK=KNOW.filter((x,i)=>!KA[i]||fa.some(a=>a>=KA[i][0]&&a<=KA[i][1])); const e=okK[rint(0,okK.length-1)]; st.ev={t:e[0],opts:[[e[1],keep(e[2])],[e[3],e[4]==="act"?act:keep(e[4])]]}; }
     else st.log.push(KNOWLINE[rint(0,KNOWLINE.length-1)]);
     if(!st.ev && st.year>=st.end) return endPretend();
     return viewYear();
   }
   if(meH){
-    if(secret && R()<.06){ st.log.push(HFOUND[rint(0,HFOUND.length-1)]); return discover(); }
+    if(secret && R()<.06){ const fa=Math.max(...st.kids.filter(k=>k.fake&&k.by<=st.year).map(k=>st.year-k.by)); let hi=rint(0,HFOUND.length-1); if(hi===2&&fa<7) hi=0; st.log.push(HFOUND[hi]); if(hi<2) st.log.push("こっそりDNA鑑定をした。"); return discover(); }
     const pickNew=(arr,used)=>{ let i,t=0; do{ i=rint(0,arr.length-1); t++; }while(used.includes(i)&&t<40); used.push(i); if(used.length>=arr.length) used.length=0; return arr[i]; };
-    if(st.year>=st.kids[0].by+1 && R()<(secret?.4:.12)){ st.ev={clue:true,t:pickNew(CLUES,st.usedC)}; }
-    else if(st.year>=st.kids[0].by && R()<.45){ const e=pickNew(HEV,st.usedH), oldest=st.year-st.kids[0].by; if(oldest>=(e.m||0) && oldest<=(e.m>=6?12:8)) st.ev=e; }
+    if(st.year>=st.kids[0].by+1 && R()<(secret?.3:.1)){ let t=pickNew(CLUES,st.usedC); if(/と言った。$|くせ毛/.test(t) && st.year-st.kids[0].by<3) t=CLUES[0]; st.ev={clue:true,t}; }
+    else if(st.year>=st.kids[0].by && R()<.45){ const e=pickNew(HEV,st.usedH), ages=stKids().map(k=>k.age), lo=e.m||0, hi=e.M!=null?e.M:12; if(ages.some(a=>a>=lo&&a<=hi) && !(e.w&&st.base.style==="主夫")) st.ev=e; }
   } else if(secret){
     if(st.him && R()<(st.cut?.2:.65)){ st.cut=false; st.sus+=3; st.affairs=(st.affairs||0)+1; const al=AFFAIR.concat(AFFAIRJOB[wJobOf(st.base)],AFFAIRJOB[wJobOf(st.base)]); st.log.push(al[rint(0,al.length-1)]); }
     if(R()*100<st.sus/6){ st.log.push("夫が、こっそりDNA鑑定をしていた。"); return discover(); }
-    if(R()<.6){ let i,t=0; do{ i=rint(0,WEV.length-1); t++; }while((st.used.includes(i)||(WEV[i].job&&WEV[i].job!==wJobOf(st.base)))&&t<60); if(WEV[i].job&&WEV[i].job!==wJobOf(st.base)) i=0; st.used.push(i); if(st.used.length>=WEV.length) st.used=[]; st.ev=WEV[i]; }
+    if(R()<.6){ const bad=i=>(WEV[i].job&&WEV[i].job!==wJobOf(st.base))||(WEV[i].him&&!WEV[i].him.includes(st.him))||(WEV[i].m||0)>st.year-st.firstFake; let i,t=0; do{ i=rint(0,WEV.length-1); t++; }while((st.used.includes(i)||bad(i))&&t<120); if(bad(i)) i=1; st.used.push(i); if(st.used.length>=WEV.length) st.used=[]; st.ev=WEV[i]; }
   }
   if(!st.ev && st.year>=st.end) return viewNever();
   viewYear();
@@ -822,7 +829,7 @@ function discover(conf,quiet){
   const assets=r10(Math.max(0,T*st.save)); const hs=b.assets>0?b.hAssets/b.assets:.6;
   const mc = S.scenario==="wife"||st.care ? (st.care>=5?"夫":st.care>=3?"ふたり":"妻") : b.mainCare;
   const nw = mc==="夫" ? pick([["夫",70],["妻",30]]) : pick([["妻",85],["夫",15]]);
-  S.fam={...b,mainCare:b.style==="主夫"?"夫":mc,nowWith:b.style==="主夫"?b.nowWith:nw,years:T,kids,assets,hAssets:r10(assets*hs),confess:!!conf,husAffair:false,extra:st.extra||0,proc0:null,forceProc:st.forceProc||null,lateClaim:!!(st.knows&&T-st.knowYear>=3)};
+  S.fam={...b,mainCare:b.style==="主夫"?"夫":mc,nowWith:b.style==="主夫"?b.nowWith:nw,years:T,kids,assets,hAssets:r10(assets*hs),confess:!!conf,husAffair:false,extra:st.extra||0,proc0:null,forceProc:st.forceProc||null,forceMode:st.forceMode||null,lateClaim:!!(st.knows&&T-st.knowYear>=3)};
   if(quiet){ S.fam.fight=null; S.fam.stay=false; S.fam.pretend=false; S.fam.proc0=S.fam.proc; S.fam.husMode="div"; return; }
   showReveal();
 }
@@ -832,7 +839,7 @@ function viewYear(){
   app.innerHTML=`
   <div style="display:flex;justify-content:space-between;align-items:center"><button class="backbtn" id="quit" style="padding:.25rem .6rem;font-size:.85rem">← やめる</button><span style="font-size:.8rem;color:var(--sub)">${meH?"あなた＝夫":"あなた＝妻"}</span></div>
   <div class="bigp num" style="font-size:2.2rem">結婚 <span class="yearnum">${st.year}</span>年目</div>
-  <div><div class="yearbar"><i id="ybar" style="width:${Math.max(0,st.year-1)/st.end*100}%"></i>${st.kids.filter(k=>k.by<=st.end).map(k=>`<b style="left:${k.by/st.end*100}%"></b>`).join("")}</div><div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--sub)"><span>結婚</span><span>たて線＝子どもが生まれる年</span><span>${st.end}年目</span></div></div>
+  <div><div class="yearbar"><i id="ybar" style="width:${Math.max(0,st.year-1)/st.end*100}%"></i>${st.kids.filter(k=>k.by<=st.year).map(k=>`<b style="left:${k.by/st.end*100}%"></b>`).join("")}</div><div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--sub)"><span>結婚</span><span>たて線＝子どもが生まれた年</span><span>${st.end}年目</span></div></div>
   <div class="pxrow" aria-hidden="true" style="min-height:64px">${px("husband",64)}${px("wife",64)}${kids.map(k=>px("kid",28+Math.min(k.age,17)*1.6|0)).join("")}</div>
   <div style="font-size:.85rem;color:var(--sub)">子ども ${kids.length}人${kids.length?"（"+kids.map(k=>k.age+"歳").join("・")+"）":""}<br>夫：${st.base.style==="主夫"?"主夫":"会社員"}（年収 ${man(st.base.h)}）　妻：${wJobOf(st.base)}（年収 ${man(st.base.w)}）</div>
   ${meH&&st.care?`<div style="font-size:.85rem;font-weight:700">育児への関わり ${"●".repeat(Math.min(st.care,6))}${"○".repeat(Math.max(0,6-st.care))}</div>`:""}
@@ -857,8 +864,6 @@ function viewYear(){
   } else if(ev && meH){
     $("#ea").onclick=()=>{ st.log.push("気のせいだ、と思うことにした。"); after(); };
     $("#eb").onclick=()=>{ st.tested++; if(kids.some(k=>k.fake)){ st.log.push("こっそりDNA鑑定を申し込んだ。結果が届いた。"); discover(); } else { st.log.push("DNA鑑定をした。まちがいなく自分の子だった。3万円と、少しの罪悪感。"); after(); } };
-  } else if(ev && ev.opts){
-    app.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>ev.opts[+b.dataset.o][1]());
   } else if(ev){
     const act=o=>{ const v=o[1]; if(o[2]==="care") st.care+=2;
       if(typeof v==="function") return v();
@@ -879,14 +884,25 @@ const KNOW=[
  ["父の日。子どもが似顔絵をくれた。「パパ」と書いてある。","かざる","似顔絵を、冷蔵庫にはった。","しまいこむ","引き出しの奥にしまった。"],
  ["酒を飲んだ夜。妻に全部ぶちまけてしまいたくなった。","こらえる","水を飲んで、寝た。","ぶちまける","act"],
  ["同僚が言った。「お前んとこ、仲いい家族でうらやましいよ」。","「まあな」と笑う","うまく笑えたと思う。","何も言えない","同僚は、けげんな顔をした。"],
- ["子どもが「ぼく、パパに似てる？」と聞いてきた。","「似てるよ」と言う","「そっくりだ」と言った。子どもはうれしそうだった。","答えられない","妻が、こっちを見ていた。"],
+ ["子どもが「パパに似てる？」と聞いてきた。","「似てるよ」と言う","「そっくりだ」と言った。子どもはうれしそうだった。","答えられない","妻が、こっちを見ていた。"],
  ["相手の男が、町で子どもを遠くから見ていた。","見なかったことにする","子どもの手を引いて、道を変えた。","もう限界だ","act"],
  ["子どもの進学のお金の話になった。","今までどおり出す","通帳を見て、うなずいた。","やっぱり納得できない","act"]
 ];
 function endPretend(){
-  discover(false,true); const f=S.fam; f.stay=true; f.pretend=true; f.toEnd=true; S.path=["pretend"];
-  if(!f.kids.length){ return viewNever(true); }
-  S.res=calc(f,S.scenario); viewVerdict();
+  clearTimeout(S.tick);
+  const st=S.st, kids=stKids(), fk=kids.filter(k=>k.fake).length;
+  const text=`【托卵離婚シミュレーター】結婚${st.year}年。私は最後まで、気づかないふりをした。\n育てた他人の子：${fk}人\n#托卵離婚シミュレーター`;
+  app.innerHTML=`
+  <button class="backbtn" id="top">← 最初へもどる</button>
+  <div class="verdict">
+    <div class="pxrow" aria-hidden="true">${px("husband",72)}${px("wife",72)}${kids.map(()=>px("kid",56)).join("")}</div>
+    <span class="label">結婚 ${st.year}年目</span>
+    <span class="total num">あなたは<br>最後まで<br>気づかないふりをした</span>
+    <ul class="lines"><li>子ども${kids.length}人のうち <b>${fk}人</b> は、あなたの子ではなかった。あなたは${st.year-st.knowYear}年間、それを知っていた。</li><li>托卵の子は全員、大人になった。最後まで、だれにも言わなかった。</li><li>かかったお金：DNA鑑定の ${man(DNA_PRIVATE)} だけ。否認の期限も、慰謝料を請求する期限も、とっくに過ぎた。</li><li>妻は、あなたが知っていることを、いまも知らない。</li></ul>
+  </div>
+  <div class="next"><a class="go" target="_blank" rel="noopener" style="text-decoration:none" href="${"https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(GAME_URL)}">結果をXにポストする</a></div>
+  <div class="next"><button class="ghost" id="again">もう一回あそぶ</button></div>`;
+  $("#again").onclick=startStory; $("#top").onclick=viewTitle; toTop();
 }
 function viewNever(knew){
   const st=S.st, meH=S.scenario==="wife", kids=stKids(), fk=kids.filter(k=>k.fake).length;
@@ -897,10 +913,10 @@ function viewNever(knew){
   <div class="verdict">
     <div class="pxrow" aria-hidden="true">${px("husband",72)}${px("wife",72)}${kids.map(()=>px("kid",52)).join("")}</div>
     <span class="label">結婚 ${st.year}年目</span>
-    <span class="total num">${knew===true?"あなたは<br>最後まで<br>気づかないふりをした":meH?"あなたは<br>最後まで<br>気づかなかった":none?"托卵には<br>ならなかった":"秘密は<br>バレなかった"}</span>
+    <span class="total num">${meH?"あなたは<br>最後まで<br>気づかなかった":none?"托卵には<br>ならなかった":"秘密は<br>バレなかった"}</span>
     <ul class="lines">${meH
-      ?`<li>子ども${kids.length}人のうち <b>${fk}人</b> は、あなたの子ではなかった。</li><li>失ったお金：0円。あなたは何も知らないまま、いちばん上の子が大人になった。</li><li>知らないほうが幸せだったのかは、だれにも分からない。</li>`
-      :none?`<li>子どもをおろしたので、夫の子ではない子は生まれなかった。</li><li>払ったお金：0円。夫は何も知らない。</li><li>あの一晩のことは、だれにも話していない。</li>`:`<li>子ども${kids.length}人のうち <b>${fk}人</b> は、夫の子ではない。夫はいまも知らない。</li><li>払ったお金：0円。ただし、この秘密は一生つづく。</li><li>嫡出否認の期限（3年）はとっくに過ぎた。今からバレても、法律上は夫の子のまま。</li>`}</ul>
+      ?`<li>子ども${kids.length}人のうち <b>${fk}人</b> は、あなたの子ではなかった。</li><li>失ったお金：0円。あなたは何も知らないまま、子どもたちは大人になった。</li><li>知らないほうが幸せだったのかは、だれにも分からない。</li>`
+      :none?(st.husKnows?`<li>子どもをおろしたので、夫の子ではない子は生まれなかった。</li><li>払ったお金：0円。離婚もしなかった。</li><li>夫は、あの一晩のことを知っている。やり直すとは言ったが、家の中は前と同じではない。</li>`:`<li>子どもをおろしたので、夫の子ではない子は生まれなかった。</li><li>払ったお金：0円。夫は何も知らない。</li><li>あの一晩のことは、だれにも話していない。</li>`):`<li>子ども${kids.length}人のうち <b>${fk}人</b> は、夫の子ではない。夫はいまも知らない。</li><li>払ったお金：0円。ただし、この秘密は一生つづく。</li><li>嫡出否認の期限（3年）はとっくに過ぎた。今からバレても、法律上は夫の子のまま。</li>`}</ul>
   </div>
   <div class="next"><a class="go" target="_blank" rel="noopener" style="text-decoration:none" href="${"https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(GAME_URL)}">結果をXにポストする</a></div>
   <div class="next"><button class="ghost" id="again">もう一回あそぶ</button><button class="ghost" id="swap">${meH?"妻であそぶ":"夫であそぶ"}</button><button class="ghost" id="top">最初へ</button></div>`;
@@ -926,12 +942,12 @@ function showReveal(){
   const meH=S.scenario==="wife";
   const fakeN=S.fam.kids.filter(k=>k.fake).length;
   const d=document.createElement("div"); d.className="reveal"; d.setAttribute("role","button"); d.tabIndex=0;
-  d.innerHTML=`<div class="inner"><div class="cry">${meH?"妻が<br>托卵していた！":"私の托卵が<br>バレた！"}</div>
-  <div class="sub">${meH?`${S.fam.kids.length===1?`DNA鑑定の結果、たった一人の子どもは <b style="font-size:1.4em">あなたの子ではなかった</b>。`:`DNA鑑定の結果、子ども${S.fam.kids.length}人のうち <b style="font-size:1.4em">${fakeN}人</b> はあなたの子ではなかった。`}`:`夫がDNA鑑定をした。子ども${S.fam.kids.length}人のうち <b style="font-size:1.4em">${fakeN}人</b> が夫の子ではないと知られた。`}</div>
+  d.innerHTML=`<div class="inner"><div class="cry">${meH?"妻が<br>托卵していた！":S.mode==="random"&&S.fam.confess?"托卵を<br>打ち明けた！":"私の托卵が<br>バレた！"}</div>
+  <div class="sub">${meH?`${S.fam.kids.length===1?`DNA鑑定の結果、たった一人の子どもは <b style="font-size:1.4em">あなたの子ではなかった</b>。`:`DNA鑑定の結果、子ども${S.fam.kids.length}人のうち <b style="font-size:1.4em">${fakeN}人</b> はあなたの子ではなかった。`}`:S.mode==="random"?`${S.fam.confess?"夫に、すべてを話した。":"夫に、知られた。"}子ども${S.fam.kids.length}人のうち <b style="font-size:1.4em">${fakeN}人</b> は夫の子ではない。`:`夫がDNA鑑定をした。子ども${S.fam.kids.length}人のうち <b style="font-size:1.4em">${fakeN}人</b> が夫の子ではないと知られた。`}</div>
   <div class="kidsr">${S.fam.kids.map(k=>`<div>${px("kid",40)} <b>${k.age}歳</b>${k.fake?`<span class="nf">✕ 夫の子ではない（托卵）</span>`:`<span class="rf">○ 夫の本当の子</span>`}</div>`).join("")}</div>
   <div class="tap">画面を押して 次へ ▶</div></div>`;
   document.body.appendChild(d); d.focus();
-  const close=()=>{ d.remove(); S.fam.fight=null; S.fam.stay=false; S.fam.pretend=false; if(S.fam.proc0) S.fam.proc=S.fam.proc0; else S.fam.proc0=S.fam.proc; if(S.scenario!=="wife" && S.mode==="random" && !S.fam.forceProc){ const r=R(); S.fam.husMode = r<.7?"div":r<.85?"lawyer":"stay"; } else S.fam.husMode=S.fam.forceProc?"lawyer":"div";
+  const close=()=>{ d.remove(); S.fam.fight=null; S.fam.stay=false; S.fam.pretend=false; if(S.fam.proc0) S.fam.proc=S.fam.proc0; else S.fam.proc0=S.fam.proc; if(S.fam.forceMode && !S.fam.forceProc) S.fam.husMode=S.fam.forceMode; else if(S.scenario!=="wife" && S.mode==="random" && !S.fam.forceProc){ const r=R(); S.fam.husMode = r<.7?"div":r<.85?"lawyer":"stay"; } else S.fam.husMode=S.fam.forceProc?"lawyer":"div";
     if(S.fam.husMode==="stay") return viewHusStay(); viewDecide(); };
   d.onclick=close; d.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();close();} };
 }
@@ -958,8 +974,8 @@ function viewDecide(){
     ["div","離婚する","慰謝料・財産分与・養育費・親権を決める。妻が応じなければ、調停や裁判になる。"],
     ["stay","離婚しない","夫婦のまま。浮気相手に慰謝料を求めて、托卵の子は否認できるならする。"],
     ["pretend","気づかないふりをする","だれにも言わない。妻にも、相手の男にも、何も求めない。"]
-  ] : [
-    ["agree","離婚に応じる","話し合いで決める。弁護士費用は少なくすむ。"],
+  ].filter(o=>!(o[0]==="pretend" && S.mode==="random" && S.st && S.st.knows)) : [
+    ["agree","離婚に応じる",f.husMode==="lawyer"?"調停で決める。裁判になるよりは早く終わる。":"話し合いで決める。弁護士費用は少なくすむ。"],
     ["refuse","離婚を拒む","夫は裁判を起こす。托卵は不貞なので、ほぼ確実に離婚になる。決着まで約2年。"]
   ];
   app.innerHTML=`
@@ -1040,7 +1056,7 @@ function viewSettle(){
 function evalPaths(){
   const base=S.fam, sc=S.scenario, meH=sc==="wife";
   const real=base.kids.some(k=>!k.fake), c=custodyChance(base).p, q=c/100;
-  const run=mod=>{ const f=JSON.parse(JSON.stringify(base)); f.stay=false; f.fight=null; mod(f); const r=calc(f,sc); return r.net-r.supFromMe; };
+  const run=mod=>{ const f=JSON.parse(JSON.stringify(base)); f.stay=false; f.pretend=false; f.fight=null; mod(f); const r=calc(f,sc); return r.net-r.supFromMe; };
   const fightEV=(proc)=>q*run(f=>{f.proc=proc;f.fight={p:c,won:true};})+(1-q)*run(f=>{f.proc=proc;f.fight={p:c,won:false};});
   const rows=[];
   if(meH){
