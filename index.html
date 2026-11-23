@@ -1454,8 +1454,8 @@ function viewVerdict(){
     ${r.supFromMe>0||r.supToMe>0?`<div class="sheet" style="margin:0"><b>養育費（上の金額に入っている）</b><br>${r.supFromMe>0?"払う":"受け取る"}：毎月 ${yen(r.supMonth)}、下の子が20歳になるまで ${r.supYears}年、合計 約${man(r.supFromMe||r.supToMe)}${r.supStuckNote||""}</div>`:""}
     ${lines.length?`<ul class="lines">${lines.map(l=>`<li>${esc(l)}</li>`).join("")}</ul>`:""}
   </div>
-  ${r.hidden?"":optimalHtml()}
   <div class="next"><a class="go" id="post" target="_blank" rel="noopener" style="text-decoration:none" href="${postUrl(r,w,meH)}">結果をXにポストする</a><button class="ghost" id="copy">リンクをコピー</button><span id="copied" class="lead" aria-live="polite"></span></div>
+  ${r.hidden?"":optimalHtml()}
   <div class="next"><button class="ghost" id="again">${S.mode==="random"?"もう一回あそぶ":"数字を変えてやり直す"}</button><button class="ghost" id="swap">${meH?"妻の側でやってみる（私の托卵がバレた！）":"夫の側でやってみる（妻が托卵していた！）"}</button><button class="ghost" id="guide">解説を読む</button><button class="backbtn" id="top">← 最初へもどる</button></div>
   <p class="note">これはゲームです。慰謝料の上乗せと年収のくじはゲーム用の目安、弁護士費用は弁護士ドットコムの集計（2026年6月）の中央値で、養育費は裁判所の算定表（2019年版）の式で計算しています。嫡出否認は、2024年4月以降に生まれた子は「知ってから3年」、それより前に生まれた子は「知ってから1年」の決まりです（ゲームでは2歳以下を否認できる子としています）。養育費は、20歳までの合計を最後の金額に入れています。実際の金額は事情で大きく変わるので、本当に困ったときは弁護士に相談してください。</p>`;
   $("#again").onclick=()=>{ if(S.mode==="random"){ startStory(); } else viewForm(); };
