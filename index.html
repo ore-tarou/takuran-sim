@@ -72,6 +72,7 @@ details.why summary{cursor:pointer;font-weight:700;text-decoration:underline}
 .pxfig{display:flex;flex-direction:column;align-items:center;gap:.15rem}
 h1,h2,.big,.total{word-break:keep-all;overflow-wrap:anywhere}
 details.calcbox summary{cursor:pointer;font-size:.85rem;text-decoration:underline;margin-top:.3rem}
+.backbtn{align-self:flex-start;background:var(--sheet);border:2px solid var(--ink);padding:.45rem .9rem;font-weight:700;font-size:1rem}
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
 .mode{background:transparent;border:2px solid var(--ink);padding:.7rem 1rem;text-align:left;display:flex;gap:.7rem;align-items:center}
 .mode .box{width:1.2rem;height:1.2rem;border:2px solid var(--ink);flex:none;display:grid;place-items:center;font-weight:700;line-height:1}
@@ -544,7 +545,8 @@ function viewTitle(){
 function viewMode(){
   const meH=S.scenario==="wife";
   app.innerHTML=`
-  <div class="caseno"><span>${meH?"事件 一　妻が托卵していた！（あなた＝夫）":"事件 二　私の托卵がバレた！（あなた＝妻）"}</span><button class="ghost" id="back">← もどる</button></div>
+  <button class="backbtn" id="back">← もどる</button>
+  <div class="caseno"><span>${meH?"あなた＝夫":"あなた＝妻"}</span></div>
   <h1 style="font-size:2rem">あそびかたを選ぶ</h1>
   <div class="pick" role="group" aria-label="決め方">
     <button class="choice" data-md="random"><span class="big">物語であそぶ</span><span class="who">結婚から1年ずつ進む。家族はくじで決まる。</span></button>
@@ -559,7 +561,8 @@ function viewForm(err){
   S.inp=f;
   const ageOpts=a=>Array.from({length:18},(_,i)=>`<option value="${i}" ${i===a?"selected":""}>${i}歳</option>`).join("");
   app.innerHTML=`
-  <div class="caseno"><span>${S.scenario==="wife"?"事件 一　妻が托卵していた！（あなた＝夫）":"事件 二　私の托卵がバレた！（あなた＝妻）"}</span><button class="ghost" id="back">← 最初へ</button></div>
+  <button class="backbtn" id="back">← 最初へもどる</button>
+  <div class="caseno"><span>${S.scenario==="wife"?"あなた＝夫":"あなた＝妻"}</span></div>
   <h1 style="font-size:2rem">家族の書類を書く</h1>
   <div class="sheet">
     <h2>ふたりのこと</h2>
@@ -609,16 +612,40 @@ function viewForm(err){
   toTop();
 }
 // ===== 物語：結婚から1年ずつ進む =====
-const FLAVOR=["家族で温泉旅行に行った。","仕事が忙しく、帰りが遅い日が続いた。","結婚記念日に、ふたりで外食した。","車を買いかえた。","家族で花火を見た。","実家に帰省した。","妻の手料理が、少しうまくなった。","町内会の役員が回ってきた。","大きな台風が来たが、家は無事だった。","家族写真を撮った。"];
-const KIDFLAVOR=[[1,"はじめて歩いた。"],[3,"幼稚園に入った。"],[6,"小学校に入学した。ランドセルが大きい。"],[9,"運動会のかけっこで一等賞。"],[12,"中学校に入学した。"],[15,"高校に入学した。"]];
-const CLUES=["妻がスマホを、いつも伏せて置くようになった。","親戚に「この子、誰にも似てないね」と言われた。","血液型の話になると、妻が急に話をそらした。","妻の帰りが遅い日が、ときどきある。","子どもの耳の形が、自分とも妻とも違う気がする。","妻が、知らない男の名前で寝言を言った。"];
+const FLAVOR=["家族で温泉旅行に行った。","仕事が忙しく、帰りが遅い日が続いた。","結婚記念日に、ふたりで外食した。","車を買いかえた。","家族で花火を見た。","実家に帰省した。","妻の手料理が、少しうまくなった。","町内会の役員が回ってきた。","大きな台風が来たが、家は無事だった。","家族写真を撮った。","夫が昇進した。給料は少しだけ上がった。","ローンを組んで、マンションを買った。","妻が髪を短く切った。","夫婦げんかをした。原因はもう思い出せない。","年末、家族で大そうじをした。","夫の父が入院したが、無事に退院した。","家族でキャンプに行った。雨だった。","妻が資格の勉強をはじめた。","夫が健康診断で引っかかった。","近所に新しいスーパーができた。","夫婦で映画を見に行った。途中で寝た。","冷蔵庫がこわれて、買いかえた。"];
+const KIDFLAVOR=[[1,"はじめて歩いた。"],[2,"「パパ」と言った。"],[3,"幼稚園に入った。"],[4,"補助輪なしで自転車に乗れた。"],[5,"父の日に似顔絵をくれた。"],[6,"小学校に入学した。ランドセルが大きい。"],[7,"はじめて逆上がりができた。"],[8,"サッカーをはじめた。"],[9,"運動会のかけっこで一等賞。"],[10,"二分の一成人式で、手紙をくれた。"],[11,"反抗期がはじまった。"],[12,"中学校に入学した。"],[13,"部活で帰りが遅くなった。"],[14,"進路で少しもめた。"],[15,"高校に入学した。"],[16,"アルバイトをはじめた。"],[17,"進路を決めた。"]];
+// 夫：あやしい出来事（調べるか選ぶ）
+const CLUES=["妻がスマホを、いつも伏せて置くようになった。","親戚に「この子、誰にも似てないね」と言われた。","血液型の話になると、妻が急に話をそらした。","妻の帰りが遅い日が、ときどきある。","子どもの耳の形が、自分とも妻とも違う気がする。","妻が、知らない男の名前で寝言を言った。","子どもが生まれた日から逆算すると、あの月は出張で家にいなかった。","妻のスマホに、知らない男からの着信が残っていた。","母子手帳を見ようとしたら、妻があわてて取り上げた。","子どもの写真を見た同僚が「奥さん似だね。……パパには？」と言った。","妻が、昔の職場の飲み会にだけは必ず出かける。","子どもがくせ毛だ。自分にも妻にも、親にもいない。","妻の実家で、義母が何か言いかけてやめた。","テレビで托卵のニュースが流れた。妻がだまってチャンネルを変えた。","ネットで「父親に似ていない子」という記事を読んでしまった。","子どもが「ママのお友だちのおじさんに会ったよ」と言った。"];
+// 夫：ふつうの出来事。育児にどれだけ関わったかは、あとで親権の見込みに効く
+const HEV=[
+ {m:1,t:"子どもが熱を出した。保育園から電話がきた。",a:["会社を早退して迎えに行く",1,"早退して迎えに行った。"],b:["妻に任せる",0,"妻に任せて、仕事にもどった。"]},
+ {t:"上司に、育休を取るか聞かれた。",a:["育休を取る",2,"育休を取った。おむつ替えがうまくなった。"],b:["取らない",0,"育休は取らなかった。"]},
+ {t:"転勤のない部署に移れる話がきた。給料は少し下がる。",a:["移る（家にいる時間がふえる）",1,"部署を移った。夕飯を家族で食べる日がふえた。"],b:["断る",0,"今の部署に残った。"]},
+ {m:6,t:"授業参観の日が、大事な会議と重なった。",a:["参観に行く",1,"授業参観に行った。子どもが何度もふり返った。"],b:["会議に出る",0,"会議に出た。参観は妻が行った。"]},
+ {m:1,t:"毎朝の保育園の送りを、どちらがやるか話し合った。",a:["自分がやる",1,"毎朝、子どもを送ってから出勤するようになった。"],b:["妻にお願いする",0,"送りは妻がやることになった。"]},
+ {m:2,t:"休日。つかれているが、子どもが「公園に行きたい」と言う。",a:["公園に連れて行く",1,"公園で日が暮れるまで遊んだ。"],b:["寝て過ごす",0,"昼まで寝ていた。"]},
+ {m:3,t:"子どもの弁当を、週に何日か作らないかと妻に言われた。",a:["作る",1,"弁当作りをはじめた。卵焼きがこげた。"],b:["無理だと断る",0,"弁当は妻が作りつづけた。"]},
+ {m:6,t:"PTAの役員決め。だれも手をあげない。",a:["自分が手をあげる",1,"PTAの役員になった。"],b:["下を向く",0,"下を向いているうちに、だれかに決まった。"]}
+];
+const HFOUND=["子どもがけがをして、病院で血液型を調べた。夫婦からは生まれない型だった。","妻のスマホの通知が見えた。「あの子、俺に似てきたな」。","子どもの学校の遺伝の宿題で、血液型が合わないことに気づいた。","知らない男が家に来て、「自分の子に会わせてほしい」と言った。","妻が酔って、口をすべらせた。"];
+// 妻：出来事。数字は夫の疑いの増減
 const WEV=[
  {t:"彼（子の本当の父）から「会いたい」と連絡がきた。",a:["会いに行く",18],b:["もう会わない",-6]},
  {t:"夫が「この子、俺に似てないよな」と笑った。",a:["笑って流す",5],b:["「失礼ね」と怒る",12]},
  {t:"義母が、家族の血液型の話をはじめた。",a:["話をそらす",9],b:["堂々とうそをつく","gamble"]},
  {t:"夫のスマホに、DNA鑑定のサイトを見たあとがあった。",a:["知らないふりをする",14],b:["自分から打ち明ける","confess"]},
  {t:"子どもの寝顔を見ていたら、罪悪感で眠れなくなった。",a:["黙っている",0],b:["自分から打ち明ける","confess"]},
- {t:"彼が「子どもに会わせてほしい」と言ってきた。",a:["一度だけ会わせる",20],b:["断る",4]}
+ {t:"彼が「子どもに会わせてほしい」と言ってきた。",a:["一度だけ会わせる",20],b:["断る",4]},
+ {t:"子どもが成長して、彼に顔が似てきた。",a:["髪型を変えてごまかす",-4],b:["何もしない",10]},
+ {t:"夫が、子どもの母子手帳を見たがっている。",a:["見せる",6],b:["「なくした」と言う",14]},
+ {t:"彼から、養育費のつもりだというお金が振り込まれた。",a:["受け取る",12],b:["送り返して、連絡を断つ",-5]},
+ {t:"ママ友に「旦那さんに似てないね」と言われた。夫もその場にいた。",a:["「私の父に似たの」と言う",3],b:["固まってしまう",15]},
+ {t:"夫が、家族みんなで健康診断を受けようと言い出した。",a:["血液型の検査だけ外してもらう",8],b:["そのまま受ける","gamble"]},
+ {t:"彼が、近所に引っ越してきた。",a:["会わないと決める",6],b:["ときどき会う",22]},
+ {t:"子どもが「どうして自分だけ、くせ毛なの？」と聞いてきた。夫が聞いている。",a:["「おじいちゃんに似たのよ」",4],b:["話を変える",9]},
+ {t:"夫が「最近、何かかくしてないか」と聞いてきた。",a:["「何も」と笑う",10],b:["自分から打ち明ける","confess"]},
+ {t:"スマホに残った、彼とのやりとり。",a:["全部消す",-8],b:["消せない",12]},
+ {t:"夫が育児をよく手伝ってくれるようになった。",a:["すなおに甘える",-3,"care"],b:["自分でやると言う",2]}
 ];
 function startStory(){
   const b=rollFamily(); const nk=b.kids.length; const births=[]; let y=rint(1,3);
@@ -627,7 +654,7 @@ function startStory(){
   const kids=births.map((by,i)=>({by,fake:i===fakeIx||R()<.25}));
   const firstFake=Math.min(...kids.filter(k=>k.fake).map(k=>k.by));
   S.mode="random"; S.path=[];
-  S.st={base:b,kids,firstFake,year:0,end:Math.min(kids[0].by+17,18),log:[],sus:10,ev:null,used:[],save:(b.h+b.w)*(.03+R()*.12),tested:0};
+  S.st={base:b,kids,firstFake,year:0,end:Math.min(kids[0].by+17,18),log:[],sus:10,ev:null,used:[],usedC:[],usedH:[],care:0,save:(b.h+b.w)*(.03+R()*.12),tested:0};
   S.st.log.push("結婚した。"); viewYear();
 }
 function stKids(){ const st=S.st; return st.kids.filter(k=>k.by<=st.year).map(k=>({age:st.year-k.by,fake:k.fake})); }
@@ -640,8 +667,10 @@ function nextYear(){
     st.log.push(kf.length?kf[0]:FLAVOR[rint(0,FLAVOR.length-1)]); }
   const secret=st.year>st.firstFake;
   if(meH){
-    if(secret && R()<.06){ st.log.push("子どもがけがをして、病院で血液型を調べた。夫婦からは生まれない型だった。"); return discover(); }
-    if(st.year>=st.kids[0].by+1 && R()<(secret?.42:.14)){ st.ev={t:CLUES[rint(0,CLUES.length-1)]}; }
+    if(secret && R()<.06){ st.log.push(HFOUND[rint(0,HFOUND.length-1)]); return discover(); }
+    const pickNew=(arr,used)=>{ let i,t=0; do{ i=rint(0,arr.length-1); t++; }while(used.includes(i)&&t<40); used.push(i); if(used.length>=arr.length) used.length=0; return arr[i]; };
+    if(st.year>=st.kids[0].by+1 && R()<(secret?.4:.12)){ st.ev={clue:true,t:pickNew(CLUES,st.usedC)}; }
+    else if(st.year>=st.kids[0].by && R()<.45){ const e=pickNew(HEV,st.usedH), oldest=st.year-st.kids[0].by; if(oldest>=(e.m||0) && oldest<=(e.m>=6?12:8)) st.ev=e; }
   } else if(secret){
     if(R()*100<st.sus/6){ st.log.push("夫が、こっそりDNA鑑定をしていた。"); return discover(); }
     if(R()<.6){ let i,t=0; do{ i=rint(0,WEV.length-1); t++; }while(st.used.includes(i)&&t<20); st.used.push(i); if(st.used.length>=WEV.length) st.used=[]; st.ev=WEV[i]; }
@@ -653,32 +682,39 @@ function discover(conf){
   const st=S.st, b=st.base, T=st.year;
   const kids=stKids().sort((a,c)=>c.age-a.age);
   const assets=r10(Math.max(0,T*st.save)); const hs=b.assets>0?b.hAssets/b.assets:.6;
-  S.fam={...b,years:T,kids,assets,hAssets:r10(assets*hs),confess:!!conf,proc0:null};
+  const mc = S.scenario==="wife"||st.care ? (st.care>=5?"夫":st.care>=3?"ふたり":"妻") : b.mainCare;
+  const nw = mc==="夫" ? pick([["夫",70],["妻",30]]) : pick([["妻",85],["夫",15]]);
+  S.fam={...b,mainCare:b.style==="主夫"?"夫":mc,nowWith:b.style==="主夫"?b.nowWith:nw,years:T,kids,assets,hAssets:r10(assets*hs),confess:!!conf,proc0:null};
   showReveal();
 }
 function viewYear(){
   const st=S.st, meH=S.scenario==="wife", kids=stKids(), ev=st.ev;
   const log=st.log.slice(-5);
   app.innerHTML=`
-  <div class="caseno"><span>${meH?"あなた＝夫":"あなた＝妻"}</span><button class="ghost" id="quit" style="font-weight:400">やめる</button></div>
+  <button class="backbtn" id="quit">← やめて最初へ</button>
+  <div class="caseno"><span>${meH?"あなた＝夫":"あなた＝妻"}</span></div>
   <div class="bigp num" style="font-size:2.2rem">結婚 ${st.year}年目</div>
   <div class="pxrow" aria-hidden="true" style="min-height:64px">${px("husband",64)}${px("wife",64)}${kids.map(k=>px("kid",28+Math.min(k.age,17)*1.6|0)).join("")}</div>
   <div style="font-size:.85rem;color:var(--sub)">子ども ${kids.length}人${kids.length?"（"+kids.map(k=>k.age+"歳").join("・")+"）":""}　夫の年収 ${man(st.base.h)}　妻の年収 ${man(st.base.w)}</div>
+  ${meH&&st.care?`<div style="font-size:.85rem;font-weight:700">育児への関わり ${"●".repeat(Math.min(st.care,6))}${"○".repeat(Math.max(0,6-st.care))}</div>`:""}
   ${!meH&&st.year>st.firstFake?`<div><div style="font-size:.85rem;font-weight:700">夫の疑い ${Math.round(st.sus)}%</div><div style="height:12px;border:2px solid var(--ink)"><div style="height:100%;width:${Math.min(100,st.sus)}%;background:var(--stamp)"></div></div></div>`:""}
   <div class="sheet" style="min-height:9.5rem"><ul class="lines" style="margin:0">${log.map((l,i)=>`<li style="${i===log.length-1?"font-weight:700":"opacity:.6"}">${esc(l)}</li>`).join("")}</ul></div>
   ${ev?`<div class="sheet" style="border:3px solid var(--ink)"><div style="font-family:var(--display);font-weight:800;font-size:1.3rem;line-height:1.4">${esc(ev.t)}</div></div>
   <div class="pick">${meH
-    ?`<button class="choice" id="ea"><span class="big">気にしない</span></button><button class="choice" id="eb"><span class="big">こっそりDNA鑑定</span><span class="who">3万円かかる</span></button>`
+    ?(ev.clue?`<button class="choice" id="ea"><span class="big">気にしない</span></button><button class="choice" id="eb"><span class="big">こっそりDNA鑑定</span><span class="who">3万円かかる</span></button>`:`<button class="choice" id="ea"><span class="big">${esc(ev.a[0])}</span></button><button class="choice" id="eb"><span class="big">${esc(ev.b[0])}</span></button>`)
     :`<button class="choice" id="ea"><span class="big">${esc(ev.a[0])}</span></button><button class="choice" id="eb"><span class="big">${esc(ev.b[0])}</span></button>`}</div>`
   :`<div class="next"><button class="go" id="ny">次の年へ ▶</button></div>`}`;
   $("#quit").onclick=viewTitle;
   const ny=$("#ny"); if(ny){ ny.onclick=()=>stay(nextYear); ny.focus(); }
   const after=()=>{ st.ev=null; if(st.year>=st.end) viewNever(); else stay(viewYear); };
-  if(ev && meH){
+  if(ev && meH && !ev.clue){
+    const h=o=>{ st.care+=o[1]; st.log.push(o[2]); after(); };
+    $("#ea").onclick=()=>h(ev.a); $("#eb").onclick=()=>h(ev.b);
+  } else if(ev && meH){
     $("#ea").onclick=()=>{ st.log.push("気のせいだ、と思うことにした。"); after(); };
     $("#eb").onclick=()=>{ st.tested++; if(kids.some(k=>k.fake)){ st.log.push("こっそりDNA鑑定を申し込んだ。結果が届いた。"); discover(); } else { st.log.push("DNA鑑定をした。まちがいなく自分の子だった。3万円と、少しの罪悪感。"); after(); } };
   } else if(ev){
-    const act=o=>{ const v=o[1];
+    const act=o=>{ const v=o[1]; if(o[2]==="care") st.care+=2;
       if(v==="confess"){ st.log.push("夫に、すべてを打ち明けた。"); return discover(true); }
       if(v==="gamble"){ if(R()<.5){ st.sus=Math.max(0,st.sus-12); st.log.push("うまくごまかせた。"); } else { st.sus+=22; st.log.push("義母は、けげんな顔をした。"); } }
       else { st.sus=Math.max(0,st.sus+v); st.log.push(`「${o[0]}」ことにした。`+(v>=12?"夫の目が、少し気になる。":v<0?"少し、気が楽になった。":"")); }
@@ -900,7 +936,7 @@ function viewVerdict(){
   </div>
   ${optimalHtml()}
   <div class="next"><a class="go" id="post" target="_blank" rel="noopener" style="text-decoration:none" href="${postUrl(r,w,meH)}">結果をXにポストする</a><button class="ghost" id="copy">リンクをコピー</button><span id="copied" class="lead" aria-live="polite"></span></div>
-  <div class="next"><button class="ghost" id="again">${S.mode==="random"?"もう一回あそぶ":"数字を変えてやり直す"}</button><button class="ghost" id="swap">${meH?"妻の側でやってみる（私の托卵がバレた！）":"夫の側でやってみる（妻が托卵していた！）"}</button><button class="ghost" id="guide">解説を読む</button><button class="ghost" id="top">最初へ</button></div>
+  <div class="next"><button class="ghost" id="again">${S.mode==="random"?"もう一回あそぶ":"数字を変えてやり直す"}</button><button class="ghost" id="swap">${meH?"妻の側でやってみる（私の托卵がバレた！）":"夫の側でやってみる（妻が托卵していた！）"}</button><button class="ghost" id="guide">解説を読む</button><button class="backbtn" id="top">← 最初へもどる</button></div>
   <p class="note">これはゲームです。慰謝料の上乗せと年収のくじはゲーム用の目安、弁護士費用は弁護士ドットコムの集計（2026年6月）の中央値で、養育費は裁判所の算定表（2019年版）の式で計算しています。嫡出否認は、2024年4月以降に生まれた子は「知ってから3年」、それより前に生まれた子は「知ってから1年」の決まりです（ゲームでは2歳以下を否認できる子としています）。養育費は最後の金額とは別に出しています。実際の金額は事情で大きく変わるので、本当に困ったときは弁護士に相談してください。</p>`;
   $("#again").onclick=()=>{ if(S.mode==="random"){ startStory(); } else viewForm(); };
   $("#top").onclick=viewTitle;
@@ -918,7 +954,7 @@ function postUrl(r,w,meH){
 function viewGuide(back){
   const L=(t,u)=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
   app.innerHTML=`
-  <div class="caseno"><span>托卵離婚シミュレーター</span><button class="ghost" id="gback">← もどる</button></div>
+  <button class="backbtn" id="gback">← もどる</button>
   <h1 style="font-size:2.2rem">解説</h1>
   <p class="lead">このゲームの計算は、2026年11月時点の日本の法律と、公開されている統計・相場にもとづいています。項目ごとに「何で決まるか」をまとめました。</p>
   <div class="sheet guide">
@@ -987,7 +1023,7 @@ function viewGuide(back){
     </ul>
   </div>
   <p class="note">これはゲームです。実際の金額や結果は、それぞれの事情で大きく変わります。本当に困ったときは弁護士に相談してください。</p>
-  <button class="go" id="gback2">← もどる</button>`;
+  <button class="backbtn" id="gback2">← もどる</button>`;
   $("#gback").onclick=back; $("#gback2").onclick=back;
   toTop();
 }
