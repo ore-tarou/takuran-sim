@@ -149,6 +149,8 @@ input[type=number],select{background:#fff;border:1px solid var(--ink);padding:.3
 .item .why{grid-column:2 / 4;font-size:.85rem;color:var(--sub)}
 .item .calc{grid-column:2 / 4;margin:.3rem 0 0;padding:.5rem .7rem;background:var(--paper);border-left:3px solid var(--ink);font-family:var(--body);font-size:.85rem;white-space:pre-wrap;overflow-x:auto;line-height:1.6}
 @media (max-width:520px){.item .calc{grid-column:2}}
+.item details.calcbox{grid-column:2 / 4}
+@media (max-width:520px){.item details.calcbox{grid-column:2}}
 .item .law{font-size:.75rem;color:var(--sub);border:1px solid var(--rule);padding:0 .35rem;margin-left:.4rem;white-space:nowrap}
 @media (max-width:520px){.item{grid-template-columns:2rem 1fr}.item .amt{grid-column:2;text-align:left}.item .why{grid-column:2}}
 @keyframes drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
@@ -458,7 +460,7 @@ function calc(f,scenario){
       if(idxW>0){
         const kid=X*idxW/(100+idxW)*X/(X+Y); annual=Math.min(wFull,kid);
         kf=head+`子どもの分 ＝ ${man(X)} × ${idxW}÷(100＋${idxW}) × ${man(X)}÷(${man(X)}＋${man(Y)}) ＝ 年 ${man(annual)}\n月額 ＝ ${yen(annual/12)} × ${mo}か月 ＝ ${man(annual/12*mo)}`;
-        kwhy=`妻は夫と別居して、子ども（${ages}）と暮らす。婚姻費用は、ふたりの収入と子どもがどちらと暮らすかで決まり、この家では夫が払う側。ただし妻は不貞をした側なので、妻自身の分は認められず、子どもの分だけ（裁判所でよくある判断）。托卵の子も、否認が決まるまでは法律上は夫の子なので入る。`;
+        kwhy=`この家では、別居のとき妻が子ども（${ages}）を連れて出た（${f.mainCare==="妻"?"ふだん主に育ててきたのが妻なので。":""}托卵をした側でも、子どもを連れて別居すること自体は止められない）。婚姻費用は、ふたりの収入と子どもがどちらと暮らすかで決まり、この家では夫が払う側。ただし妻は不貞をした側なので、妻自身の分は認められず、子どもの分だけ（裁判所でよくある判断）。托卵の子も、否認が決まるまでは法律上は夫の子なので入る。`;
       } else { kwhy="妻は不貞をした側なので、子どもと暮らしていない妻の生活費は認められない。"; konPayer=""; }
     } else if(hFull>0){
       konPayer="妻 → 夫"; annual=hFull;
