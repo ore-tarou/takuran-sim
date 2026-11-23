@@ -938,6 +938,13 @@ function apEnd(kind,unborn){ const st=S.st, ks=(st.apKids||[]).map(k=>({...k,age
   if(pay.length){ const sp=supportTotal(st.base.h,250,pay.map(k=>k.age)); if(sp.total>0) x.push({what:"浮気相手の子の養育費",amt:Math.round(sp.total),law:"民法877条",why:`${pay.map(nm).join("・")}は、${pay.every(k=>k.unborn)?"あなたが認知した。":"相手の夫が「自分の子ではない」と嫡出否認をして、あなたが認知した（否認できるのは、生まれたと知ってから3年まで）。"}認知した子には、養育費を払う義務がある。算定表の式で月 ${yen(sp.month)}、20歳までの合計。`,line:`${pay.map(nm).join("・")}を認知した。養育費は月 ${yen(sp.month)}、20歳まで。`}); }
   if(no.length) x.push({line:`${no.map(nm).join("・")}は、否認の期限（3年）を過ぎていた。法律上は相手の夫の子のまま。あなたは養育費を払わない。`});
   hiddenDivorce({...AP_END[kind],x}); }
+function caughtScene(cry,sub,then){ clearTimeout(S.tick); if(S.st) S.st.ev=null;
+  const d=document.createElement("div"); d.className="reveal ap"; d.setAttribute("role","button"); d.tabIndex=0;
+  d.innerHTML=`<div class="inner"><div style="animation:slam .5s cubic-bezier(.2,1.6,.4,1) both">${px("wife",130)}</div><div class="cry" style="font-size:clamp(2.2rem,8vw,4.5rem)">${cry}</div><div class="sub">${sub}</div><div class="tap">画面を押して 次へ ▶</div></div>`;
+  document.body.appendChild(d); d.focus();
+  const close=()=>{ d.remove(); then(); };
+  d.onclick=close; d.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();close();} };
+}
 function apExposed(){ const st=S.st; clearTimeout(S.tick); st.ev=null;
   st.log.push(`${st.ap?st.ap.w:"後輩"}の夫が、DNA鑑定をした。弁護士をつれて、家に来た。妻に、すべてがバレた。離婚を申し込まれた。`);
   const ks=st.apKids.map(k=>({...k,age:st.year-k.by}));
@@ -1060,7 +1067,7 @@ function nextYear(){
   if(meH){
     const fin=()=>{ st.ev=null; if(st.year>=st.end) viewNever(); else stay(viewYear); };
     if(st.vice){ const v=st.vice; st.assets-=v.cost; st.viceSpent=(st.viceSpent||0)+v.cost;
-      if(R()<.1){ st.log.push(`${v.label}が、妻にバレた。離婚を申し込まれた。`); clearTimeout(S.tick); return hiddenDivorce(v); }
+      if(R()<.1){ st.log.push(`${v.label}が、妻にバレた。離婚を申し込まれた。`); return caughtScene(`${v.label}が<br>妻にバレた！`,"妻に、離婚を申し込まれた。",()=>hiddenDivorce(v)); }
       if(R()<.15){ st.vice=null; st.viceDone=true; st.log.push(v.stop); }
       else st.log.push(v.year+`（今年 −${man(v.cost)}）`);
     } else if(!st.viceDone && (st.viceAsk||0)<2 && st.base.style!=="主夫" && !st.ill && st.year>=2 && R()<.04){ st.viceAsk=(st.viceAsk||0)+1;
@@ -1078,13 +1085,13 @@ function nextYear(){
         if(o==="takuran"){ const g=R()<.5?"m":"f"; let n; do{ n=NAMES[g][rint(0,49)]; }while(st.kids.some(k=>k.n===n)||apK.some(k=>k.n===n)); apK.push({by:st.year,g,n});
           st.log.push(`彼女は、夫の子として産んだ。${g==="m"?"男の子":"女の子"}で、名前は「${n}」。あなたの子が、よその家で育っている。`); st.apWait=true; return fin(); }
         if(o==="abort"){ st.assets-=20; st.log.push("彼女は手術を受けた。費用の20万円は、あなたが出した。"); if(R()<.5){ st.hAffair=0; st.hAffDone=true; st.log.push("彼女から、連絡が来なくなった。関係は終わった。"); } else st.apWait=true; return fin(); }
-        st.log.push("彼女は夫と別れて、産むと決めた。あなたに認知を求めてきた。妻に、すべてがバレた。離婚を申し込まれた。"); clearTimeout(S.tick); apEnd("own",true); };
+        st.log.push("彼女は夫と別れて、産むと決めた。あなたに認知を求めてきた。妻に、すべてがバレた。離婚を申し込まれた。"); caughtScene("浮気と妊娠が<br>妻にバレた！","彼女は夫と別れて、産むと決めた。妻に、離婚を申し込まれた。",()=>apEnd("own",true)); };
       st.ev={t:again?`浮気相手の${apW}が、また妊娠した。彼女には夫がいる。二人目も、あなたの子だ。`:`浮気相手の${apW}が、妊娠した。彼女には夫がいる。おなかの子は、あなたの子だ。`,opts:[
         [again?"「この子も、旦那さんの子として産んでくれ」（托卵させる）":"「旦那さんの子として産んでくれ」（托卵させる）",()=>settle("takuran")],
         ["「おろしてくれ」",()=>settle("abort")],
         ["「俺の子だ。認める」（托卵させない）",()=>settle("own")]]}; return viewYear(); }
     if(st.hAffair){
-      if(R()<.12){ st.log.push("浮気がバレた。妻に、離婚を申し込まれた。"); clearTimeout(S.tick); return hiddenDivorce(true); }
+      if(R()<.12){ st.log.push("浮気がバレた。妻に、離婚を申し込まれた。"); return caughtScene("浮気が<br>妻にバレた！","妻に、離婚を申し込まれた。",()=>hiddenDivorce(true)); }
       if(R()<.2){ st.hAffair=0; st.hAffDone=true; st.log.push(`${apW}が${st.ap?st.ap.e:"異動して"}、関係は終わった。妻は、何も気づいていない。`); }
       else st.log.push(["また、浮気をした。","残業だとうそをついて、浮気をした。","出張の夜、浮気をした。","「これで最後」と言いながら、浮気をした。"][rint(0,3)]);
     } else if(!st.hAffDone && !st.hAffAsk && st.hInv && st.year>=st.hInv && st.base.style!=="主夫" && !st.ill){ st.hAffAsk=1; st.ap=AP_WHO[rint(0,AP_WHO.length-1)];
