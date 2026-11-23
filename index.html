@@ -690,8 +690,7 @@ function wifeChain(){ // その年に起きる妻だけの出来事。あれば 
       ["産む。夫には言わない",()=>{ st.log.push("だまって産むと決めた。"); st.sus+=3; wNext(); }],
       ["子どもをおろす",()=>{ st.kids.splice(st.kids.indexOf(pre),1); refreshFake(); st.aborted=(st.aborted||0)+1; st.sus+=6; st.log.push("手術を受けた。夫には、体調が悪いとだけ言った。"); wNext(); }],
       ["夫に打ち明ける",()=>{ st.log.push("夫に、すべてを打ち明けた。");
-        if(R()<.45){ pre.fake=true; return viewForgiven(); }
-        st.log.push("夫は離婚を切り出した。子どもは、話し合いの最中に生まれた。"); st.year=pre.by; discover(true); }]
+        st.log.push("夫は何も言わずに家を出た。数日後、離婚を切り出された。子どもは、話し合いの最中に生まれた。"); st.year=pre.by; discover(true); }]
     ]}; return true; }
   const b=st.kids.find(k=>k.fake&&k.by===y&&!k.asked);
   if(b){ b.asked=true;
