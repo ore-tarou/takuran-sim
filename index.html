@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="托卵が発覚したら、お金と子どもはどうなる？ 慰謝料・財産分与・養育費・親権を、日本の法律と統計で計算するゲーム。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="托卵離婚シミュレーター">
+<meta property="og:description" content="托卵が発覚したら、お金と子どもはどうなる？ 慰謝料・財産分与・養育費・親権を、日本の法律と統計で計算するゲーム。">
+<meta property="og:url" content="https://ore-tarou.github.io/takuran-sim/">
+<meta property="og:image" content="https://ore-tarou.github.io/takuran-sim/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="托卵離婚シミュレーター">
+<meta name="twitter:image" content="https://ore-tarou.github.io/takuran-sim/ogp.png">
+<title>托卵離婚シミュレーター</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=BIZ+UDPGothic:wght@400;700&display=swap">
+<style>
+/* 法廷の書類（調停調書）をめくっていく画面。紙・墨・朱の印。1色だけに頼らず、言葉と記号（＋／−、受け取る／払う）で区別する */
+:root{
+  --paper:#eceeea;      /* 書類の紙 */
+  --sheet:#f8f9f6;      /* 前に出る紙 */
+  --ink:#16181c;        /* 墨 */
+  --sub:#4d535b;        /* 薄い墨 */
+  --rule:#8d949c;       /* 罫線 */
+  --stamp:#b3261e;      /* 朱の印（形と文字で意味を出す） */
+  --dark:#0d0e10;       /* 発覚の画面 */
+  --display:"Shippori Mincho B1","Yu Mincho","Hiragino Mincho ProN",serif;
+  --body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",sans-serif;
+  color-scheme:light;
+}
+html{font-size:clamp(16px,1.2vw + 1.1vh,26px);height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);margin:0;min-height:100%;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+*{box-sizing:border-box}
+.wrap{max-width:46rem;margin:0 auto;padding-block:1.6rem 3rem;display:flex;flex-direction:column;gap:1.4rem}
+h1,h2,h3{font-family:var(--display);font-weight:800;margin:0;text-wrap:balance;line-height:1.3}
+.num{font-variant-numeric:tabular-nums}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+/* 見出しの帯：事件番号ふう */
+.caseno{font-size:.8rem;color:var(--sub);letter-spacing:.12em;border-bottom:1px solid var(--rule);padding-bottom:.4rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.title{font-size:clamp(2.4rem,7vw,4.2rem);letter-spacing:.04em}
+.lead{font-size:1rem;color:var(--sub);margin:0}
+
+/* 大きな選択（書類を選ぶ） */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:640px){.choices{grid-template-columns:1fr}}
+.choice{background:var(--sheet);border:2px solid var(--ink);border-radius:0;text-align:left;padding:1.1rem 1.2rem 1.2rem;display:flex;flex-direction:column;gap:.4rem;position:relative;box-shadow:6px 6px 0 var(--ink);transition:transform .12s, box-shadow .12s}
+.choice:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
+.choice[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.choice[aria-pressed="true"] .who{color:var(--sheet)}
+.choice .no{font-size:.8rem;letter-spacing:.15em}
+.choice .big{font-family:var(--display);font-weight:800;font-size:1.7rem;line-height:1.25}
+.choice .who{font-size:.9rem;color:var(--sub)}
+.choice .mark{position:absolute;right:.8rem;top:.6rem;font-size:1.4rem;font-weight:700}
+
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.mode{background:transparent;border:2px solid var(--ink);padding:.7rem 1rem;text-align:left;display:flex;gap:.7rem;align-items:center}
+.mode .box{width:1.2rem;height:1.2rem;border:2px solid var(--ink);flex:none;display:grid;place-items:center;font-weight:700;line-height:1}
+.mode[aria-pressed="true"] .box::after{content:"✓"}
+.mode[aria-pressed="true"]{border-width:4px;padding:calc(.7rem - 2px) calc(1rem - 2px)}
+.mode b{display:block}
+.mode small{color:var(--sub);font-size:.8rem}
+@media (max-width:520px){.modes{grid-template-columns:1fr}}
+
+.go{align-self:flex-start;background:var(--ink);color:var(--sheet);border:0;padding:.9rem 2.2rem;font-family:var(--display);font-weight:800;font-size:1.3rem;letter-spacing:.1em}
+.go:hover{background:#000}
+.ghost{background:transparent;border:0;border-bottom:2px solid var(--ink);padding:.3rem 0;font-weight:700}
+
+/* 入力の書類 */
+.sheet{background:var(--sheet);border:1px solid var(--rule);padding:1.2rem 1.3rem;display:flex;flex-direction:column;gap:1rem}
+.sheet h2{font-size:1.3rem;border-bottom:2px solid var(--ink);padding-bottom:.3rem}
+.field{display:grid;grid-template-columns:11rem 1fr;gap:.8rem;align-items:center}
+@media (max-width:560px){.field{grid-template-columns:1fr;gap:.2rem}}
+.field label{font-weight:700}
+.field .hint{grid-column:2;font-size:.78rem;color:var(--sub);margin-top:-.6rem}
+@media (max-width:560px){.field .hint{grid-column:1;margin-top:0}}
+.slidewrap{display:flex;flex-direction:column;align-items:stretch;gap:.3rem;width:100%}
+.slide{width:100%;max-width:24rem;height:2.2rem;accent-color:var(--ink);cursor:pointer;margin:0}
+.slide::-webkit-slider-thumb{width:1.6rem;height:1.6rem}
+.unit.slidewrap{flex-direction:column;align-items:stretch}
+.slidewrap .unit{display:flex;justify-content:flex-start;align-items:center;gap:.5rem;white-space:nowrap}
+.slidewrap input[type=number]{width:8rem;flex:none}
+input[type=number],select{background:#fff;border:1px solid var(--ink);padding:.35rem .5rem;width:100%;max-width:14rem;border-radius:0}
+.unit{display:flex;gap:.5rem;align-items:center}
+.kids{display:flex;flex-direction:column;gap:.5rem}
+.kid{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.kid .k{font-weight:700;width:3.4rem}
+.kid select{width:auto}
+.err{color:var(--stamp);font-weight:700;margin:0}
+.err::before{content:"！ "}
+
+/* 発覚の画面 */
+.reveal{position:fixed;inset:0;background:var(--dark);color:#f2f2f2;display:grid;place-items:center;z-index:20;padding:2rem max(16px,env(safe-area-inset-left,0px));cursor:pointer;text-align:center}
+.reveal .inner{display:flex;flex-direction:column;gap:1.2rem;align-items:center}
+.reveal .cry{font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,9vw,6rem);line-height:1.15;animation:slam .5s cubic-bezier(.2,1.6,.4,1) both}
+.reveal .sub{font-size:1.1rem;opacity:.85;animation:fade .6s .5s both}
+.reveal .tap{font-size:.85rem;opacity:.6;animation:fade .6s 1s both}
+@keyframes slam{from{transform:scale(2.2);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* 配られた家族 */
+.family{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.8rem}
+.person{background:var(--sheet);border:1px solid var(--rule);padding:.8rem 1rem;min-width:0}
+.person .role{font-size:.8rem;color:var(--sub);letter-spacing:.1em}
+.person .nm{font-family:var(--display);font-weight:800;font-size:1.2rem}
+.person.me{border:3px solid var(--ink)}
+.person.me .role::after{content:"　← あなた";font-weight:700;color:var(--ink)}
+.kidtag{display:inline-block;border:2px solid var(--ink);padding:0 .4rem;font-weight:700;font-size:.85rem;margin-left:.3rem}
+.kidtag.fake{border-style:dashed}
+
+/* 精算の書類 */
+.items{display:flex;flex-direction:column;gap:0;background:var(--sheet);border:1px solid var(--rule)}
+.item{display:grid;grid-template-columns:2.4rem 1fr auto;gap:.2rem 1rem;padding:1rem 1.2rem;border-top:1px solid var(--rule);align-items:baseline;animation:drop .35s ease-out both}
+.item:first-child{border-top:0}
+.item .ix{font-family:var(--display);font-weight:800;font-size:1.2rem}
+.item .what{font-weight:700;font-size:1.05rem}
+.item .amt{font-family:var(--display);font-weight:800;font-size:1.35rem;text-align:right;white-space:nowrap}
+.item .why{grid-column:2 / 4;font-size:.85rem;color:var(--sub)}
+.item .calc{grid-column:2 / 4;margin:.3rem 0 0;padding:.5rem .7rem;background:var(--paper);border-left:3px solid var(--ink);font-family:var(--body);font-size:.85rem;white-space:pre-wrap;overflow-x:auto;line-height:1.6}
+@media (max-width:520px){.item .calc{grid-column:2}}
+.item .law{font-size:.75rem;color:var(--sub);border:1px solid var(--rule);padding:0 .35rem;margin-left:.4rem;white-space:nowrap}
+@media (max-width:520px){.item{grid-template-columns:2rem 1fr}.item .amt{grid-column:2;text-align:left}.item .why{grid-column:2}}
+@keyframes drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.next{display:flex;gap:1.2rem;align-items:center;flex-wrap:wrap}
+
+/* 判決（結果） */
+.verdict{background:var(--sheet);border:3px solid var(--ink);padding:1.4rem 1.4rem 1.6rem;position:relative;display:flex;flex-direction:column;gap:.8rem;overflow:hidden}
+.verdict .label{font-size:.9rem;letter-spacing:.15em;color:var(--sub)}
+.verdict .total{font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,8vw,4.4rem);line-height:1.1}
+.verdict .rows{display:grid;grid-template-columns:1fr auto;gap:.3rem 1rem;border-top:1px solid var(--rule);padding-top:.7rem}
+.verdict .rows span:nth-child(even){text-align:right;font-weight:700}
+.stamp{position:absolute;right:1rem;top:1rem;width:7.2rem;height:7.2rem;border:5px solid var(--stamp);color:var(--stamp);border-radius:50%;display:grid;place-items:center;text-align:center;font-family:var(--display);font-weight:800;line-height:1.1;transform:rotate(-12deg);animation:stamp .35s .2s cubic-bezier(.2,1.8,.4,1) both;background:transparent}
+.stamp b{font-size:2.2rem;display:block}
+.stamp small{font-size:.75rem}
+@keyframes stamp{from{transform:rotate(-12deg) scale(2.4);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:1}}
+@media (max-width:560px){.stamp{position:static;align-self:flex-end;margin-top:-.5rem}}
+.lines{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.3rem}
+.guide p{margin:0}
+.guide a{color:var(--ink);font-weight:700}
+.note{font-size:.78rem;color:var(--sub);border-top:1px solid var(--rule);padding-top:.8rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+"use strict";
+// ===== 数字のもと（出典は企画メモ） =====
+// 算定表（2019年版）の基礎収入割合：給与の人。[年収の上限(万円), 割合]
+const BASE_RATE=[[75,.54],[100,.50],[125,.46],[175,.44],[275,.43],[525,.42],[725,.41],[1325,.40],[1475,.39],[2000,.38]];
+const baseIncome=y=>{ if(y<=0) return 0; const c=Math.min(y,2000); for(const [u,r] of BASE_RATE){ if(c<=u) return c*r; } return c*.38; };
+const rateOf=y=>{ const c=Math.min(Math.max(y,0),2000); for(const [u,r] of BASE_RATE){ if(c<=u) return r; } return .38; };
+const lifeIdx=age=>age>=15?85:62;
+// 慰謝料（仮）：不貞200万＋托卵100万＋結婚年数・托卵の子の数で上乗せ、上限500万
+// 費用（仮の目安・一人分）
+// 弁護士費用：弁護士ドットコム（2026年6月）の中央値。着手金＋基本報酬金。ほかに受け取ったお金の12%を成功報酬（相場10〜16%）
+const COST={協議:{law:44,etc:1,txt:"弁護士 44万円（着手金22万＋報酬金22万）＋公正証書など 約1万円"},調停:{law:60,etc:1,txt:"弁護士 60万円（着手金27.5万＋報酬金32.5万）＋申し立て・切手 約1万円"},裁判:{law:66,etc:2,txt:"弁護士 66万円（着手金33万＋報酬金33万）＋印紙・切手 約2万円"}};
+const SUCCESS=.12;
+// DNA鑑定：自分で調べる私的鑑定 約3万円、裁判で使う法的鑑定 約10万円（mc-law・ヒロクリニック 2026年11月）
+const DNA_PRIVATE=3, DNA_LEGAL=10, DENY_LAWYER=20;
+const CUSTODY_FIGHT=31; // 親権を争う：追加着手金22万（デイライトの例）＋日当3万×3回 // 否認の弁護士は仮の目安
+
+// ===== 道具 =====
+const R=Math.random;
+const pick=(arr)=>{ let t=R()*arr.reduce((s,a)=>s+a[1],0); for(const a of arr){ if((t-=a[1])<0) return a[0]; } return arr[arr.length-1][0]; };
+const rint=(a,b)=>a+Math.floor(R()*(b-a+1));
+const r10=x=>Math.round(x/10)*10;
+const man=v=>{ v=Math.round(v); return v.toLocaleString("ja-JP")+"万円"; };
+const yen=v=>{ // 万円 → 「7万1,000円」
+  const y=Math.round(v*10000/1000)*1000; const m=Math.floor(y/10000), r=y%10000;
+  if(m===0) return r.toLocaleString("ja-JP")+"円";
+  return m.toLocaleString("ja-JP")+"万"+(r?r.toLocaleString("ja-JP"):"")+"円"; };
+const sign=(v)=>v>0?"＋":v<0?"−":"±";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// ===== 状態 =====
+const S={scenario:null,mode:"random",inp:null,fam:null,res:null,step:0};
+const $=sel=>document.querySelector(sel);
+const app=$("#app");
+// 同じ画面の中で書き直すときは、スクロールの位置を保つ
+const stay=fn=>{ const y=window.scrollY; S.noTop=true; fn(); S.noTop=false; window.scrollTo(0,y); };
+const toTop=()=>{ if(!S.noTop) window.scrollTo(0,0); };
+
+// ===== くじ（統計にもとづく） =====
+function husbandIncome(){ // 既婚男性の年収（仮の分布）
+  const b=pick([[[200,300],8],[[300,400],15],[[400,500],20],[[500,600],18],[[600,700],13],[[700,800],9],[[800,1000],10],[[1000,1500],6],[[1500,2500],1]]);
+  return r10(b[0]+R()*(b[1]-b[0])); }
+function rollFamily(){
+  const years=rint(3,18);
+  const style=pick([["共働き",74],["専業主婦",25],["主夫",1]]);
+  let h=husbandIncome(), w=0, wJob="";
+  if(style==="共働き"){ if(R()<.55){ w=r10(60+R()*90); wJob="パート"; } else { w=r10(250+R()*(R()<.2?600:350)); wJob="正社員"; } }
+  if(style==="主夫"){ w=r10(400+R()*500); h=0; wJob="正社員"; }
+  const nk=pick([[1,45],[2,40],[3,15]]);
+  const maxAge=Math.min(years-1,17);
+  const ages=[]; for(let i=0;i<nk;i++) ages.push(rint(0,Math.max(0,maxAge)));
+  ages.sort((a,b)=>b-a);
+  const fakeIx=rint(0,nk-1);
+  const kids=ages.map((a,i)=>({age:a,fake:i===fakeIx||R()<.25}));
+  const save=(h+w)*(.03+R()*.12);
+  const assets=r10(Math.max(0,years*save));
+  const hShare=(h+w)>0? Math.min(.95,Math.max(.3,h/(h+w)+(R()-.5)*.2)):.5;
+  const custody= style==="主夫" ? "夫" : pick([["妻",77],["夫",10],["共同",13]]);
+  const mainCare = style==="主夫" ? "夫" : style==="専業主婦" ? "妻" : pick([["妻",85],["ふたり",10],["夫",5]]);
+  const nowWith = mainCare==="夫" ? pick([["夫",70],["妻",30]]) : pick([["妻",85],["夫",15]]);
+  const kidWish = pick([["父",40],["母",60]]);
+  const proc=pick([["協議",30],["調停",45],["裁判",25]]);
+  return {years,style,h,w,wJob,kids,assets,hAssets:r10(assets*hShare),custody,proc,mainCare,nowWith,kidWish};
+}
+
+// ===== 計算 =====
+function supportTotal(obIncome,rtIncome,kidAges){ // 子どもが20歳になるまでの合計と、今の月額
+  const ob=baseIncome(obIncome), rt=baseIncome(rtIncome);
+  if(ob<=0||kidAges.length===0) return {month:0,total:0,years:0,ob,rt,idx0:0,annual:0};
+  let total=0, first=0, yrs=0, idx0=0;
+  for(let y=0;y<20;y++){
+    const idx=kidAges.filter(a=>a+y<20).reduce((s,a)=>s+lifeIdx(a+y),0);
+    if(idx===0) break;
+    const annual=ob*idx/(100+idx)*ob/(ob+rt);
+    if(y===0){ first=annual; idx0=idx; } total+=annual; yrs=y+1;
+  }
+  return {month:first/12,total,years:yrs,ob,rt,idx0,annual:first};
+}
+function calc(f,scenario){
+  const meHusband = scenario==="wife";
+  const fakes=f.kids.filter(k=>k.fake);
+  // 嫡出否認：父は「子の生まれを知った時から3年」。生まれた時に知ったものとする
+  const denied=fakes.filter(k=>k.age<3), stuck=fakes.filter(k=>k.age>=3);
+  const items=[]; let net=0; // net = あなたの財布（万円）。＋受け取る／−払う
+  // 1 否認
+  fakes.forEach(k=>{
+    const ok=k.age<3;
+    items.push({what:`托卵の子（${k.age}歳）の嫡出否認`,amt: ok?"否認できる":"否認できない",law:"民法777条",
+      why: ok ? "生まれてから3年たっていないので、裁判で「夫の子ではない」と決められる。夫と子の親子関係はなくなる。"
+              : "生まれたのを知ってから3年が過ぎている。DNAで他人の子と分かっても、法律上は夫の子のまま。"});
+  });
+  // 2 慰謝料：妻が夫に払う
+  let isha=200+50+Math.min(Math.max(f.years-5,0)*3,30)+(fakes.length-1)*20+stuck.length*20;
+  const ishaRaw=isha; isha=Math.min(isha,300);
+  const incAdj = f.w>500 ? Math.min(Math.round((f.w-500)/100)*10,50) : 0; isha+=incAdj;
+  const ishaF=`不貞 200万 ＋ 托卵 50万`+(f.years>5?` ＋ 結婚年数 (${f.years}−5)×3万`:"")+(fakes.length>1?` ＋ 托卵の子2人目から ${fakes.length-1}×20万`:"")+(stuck.length?` ＋ 否認できない子 ${stuck.length}×20万`:"")+` ＝ ${man(Math.min(ishaRaw,300))}`+(ishaRaw>300?"（上限300万円）":"")+(incAdj?`\n妻の年収 ${man(f.w)} が高いので ＋${man(incAdj)} ＝ ${man(isha)}`:"");
+  net += meHusband? isha : -isha;
+  items.push({what:"慰謝料（妻 → 夫）",amt:(meHusband?"＋":"−")+man(isha),law:"民法709・710条",
+    f:ishaF,why:`不貞と托卵は妻の側に責任がある。托卵で離婚する場合の目安は200万〜300万円（妻と浮気相手を合わせた額）。結婚年数（${f.years}年）や子どもの数で上乗せするのはゲーム用の計算で、上限は300万円。払う側の収入は、裁判では影響が小さい要素とされるが、収入が高いと少し上がることがある（ゲームでは妻の年収500万円を超えた分100万円ごとに＋10万円、最大＋50万円）。`+(f.w<100?" 妻の収入が少ないので、実際には分割払いになったり、取り立てられないこともある。":"")});
+  // 3 財産分与：半分ずつ
+  const half=f.assets/2, hPays=f.hAssets-half; // ＋なら夫が妻に払う
+  const myBunyo = meHusband? -hPays : hPays;
+  net += myBunyo;
+  const bunF=`財産 ${man(f.assets)} ÷ 2 ＝ ひとり ${man(half)}\n夫名義 ${man(f.hAssets)} − ${man(half)} ＝ ${hPays>=0?"夫が妻に "+man(hPays):"妻が夫に "+man(-hPays)}`;
+  items.push({f:bunF,what: hPays>=0?"財産分与（夫 → 妻）":"財産分与（妻 → 夫）",amt: sign(myBunyo)+man(Math.abs(hPays)),law:"民法768条",
+    why:`結婚後に増えた財産 ${man(f.assets)}（夫名義 ${man(f.hAssets)}）を半分ずつに分ける。托卵した側でも半分もらえる。慰謝料とは別の話。`});
+  // 4 親権
+  let liveWith=f.custody==="夫"?"夫":"妻";
+  let custodyTxt={妻:"妻が一人で親権を持つ（日本では約87%がこの形）",夫:"夫が一人で親権を持つ",共同:"共同親権（2026年4月から選べる）。子どもは妻と暮らす"}[f.custody];
+  let kidsWithHusband = liveWith==="夫" ? f.kids.filter(k=>!(k.fake&&k.age<3)) : [];
+  if(f.fight){
+    const realK=f.kids.filter(k=>!k.fake);
+    if(f.fight.won){ liveWith="夫"; kidsWithHusband=realK; custodyTxt=`親権を争った結果（見込み ${f.fight.p}%）、本当の子の親権は夫。托卵の子は妻が育てる（兄弟は分けないのが原則だが、事情があれば分かれる）`; }
+    else { liveWith="妻"; kidsWithHusband=[]; custodyTxt=`親権を争ったが（見込み ${f.fight.p}%）、子どもの親権は妻`; }
+  }
+  let kidsWithWife = f.kids.filter(k=>!kidsWithHusband.includes(k));
+  let cWhy=custodyTxt+"。";
+  if(liveWith==="夫" && denied.length) cWhy+=" 否認した托卵の子は夫の子ではなくなるので、妻が育てる。";
+  if(liveWith==="夫" && stuck.length && !f.fight) cWhy+=" 否認できなかった托卵の子は、夫が自分の子として育てることになる。";
+  if(f.fight && f.fight.won && stuck.length) cWhy+=" 否認できなかった托卵の子は法律上は夫の子のままなので、妻と暮らしても夫が養育費を払う。";
+  items.push({what:"親権と子どもの暮らす家",amt: liveWith==="夫"?"夫の家":"妻の家",law:"民法819条",why:cWhy});
+  // 5 養育費：子どもと暮らさない親が払う。夫は法律上の父である子だけ
+  let supWhy="", supTot=0, supMonth=0, supPayer="", supToMe=0, supFromMe=0, supF="", supYears=0;
+  const supFormula=(obName,obInc,rtName,rtInc,s)=>{ if(!s.ob) return "";
+    const life=s.ob*s.idx0/(100+s.idx0);
+    return `${obName}の基礎収入 ＝ ${man(obInc)} × ${Math.round(rateOf(obInc)*100)}% ＝ ${man(s.ob)}\n${rtName}の基礎収入 ＝ ${man(rtInc)} × ${Math.round(rateOf(rtInc)*100)}% ＝ ${man(s.rt)}\n子の生活費 ＝ ${man(s.ob)} × ${s.idx0} ÷ (100＋${s.idx0}) ＝ ${man(life)}\n年額 ＝ ${man(life)} × ${man(s.ob)} ÷ (${man(s.ob)}＋${man(s.rt)}) ＝ ${man(s.annual)}\n月額 ＝ 年額 ÷ 12 ＝ ${yen(s.month)}`; };
+  const legalW=kidsWithWife.filter(k=>!(k.fake&&k.age<3));
+  if(legalW.length && f.h>0){
+    const s=supportTotal(f.h,f.w,legalW.map(k=>k.age));
+    supTot=s.total; supMonth=s.month; supPayer="夫 → 妻"; supYears=s.years; supF=supFormula("夫",f.h,"妻",f.w,s);
+    supWhy=`夫の年収 ${man(f.h)}、妻の年収 ${man(f.w)}、対象の子 ${legalW.length}人（`+legalW.map(k=>k.age+"歳"+(k.fake?"・托卵の子":"")).join("、")+`）を算定表の式で計算。子どもが20歳になるまで（${s.years}年）、合計 ${man(s.total)}。`;
+    if(stuck.some(k=>kidsWithWife.includes(k))) supWhy+=" 托卵の子でも、否認できなかったので夫が払う。";
+    if(meHusband) supFromMe=s.total; else supToMe=s.total;
+  }
+  if(kidsWithHusband.length && f.w>0){
+    const s=supportTotal(f.w,f.h,kidsWithHusband.map(k=>k.age));
+    supTot=s.total; supMonth=s.month; supPayer="妻 → 夫"; supYears=s.years; supF=supFormula("妻",f.w,"夫",f.h,s);
+    supWhy=`子どもが夫と暮らすので、妻が払う。妻の年収 ${man(f.w)}、夫の年収 ${man(f.h)}、子ども ${kidsWithHusband.length}人で算定表の式で計算。20歳まで（${s.years}年）、合計 ${man(s.total)}。`;
+    if(meHusband) supToMe=s.total; else supFromMe=s.total;
+  }
+  if(denied.some(k=>kidsWithWife.includes(k))) supWhy+=" 否認した托卵の子のぶんは、夫は払わない（本当の父親に認知を求めることになる）。";
+  if(!supPayer) supWhy=(supWhy?supWhy+" ":"")+"払う側の収入が0円か、対象の子がいない。";
+  net -= supFromMe;
+  const supAmt = supFromMe>0 ? "−月 "+yen(supMonth) : supToMe>0 ? "受け取る 月 "+yen(supMonth) : "なし";
+  items.push({what:`養育費${supPayer?"（"+supPayer+"）":""}`,amt:supAmt,law:"民法766・877条",f:supF+(supF?"\n生活指数：14歳以下 62、15歳以上 85（子どもごとに足す）":""),why:supWhy});
+  if(f.fight && f.proc==="協議") f.proc="調停";
+  // 6 費用
+  let cost=COST[f.proc].law+COST[f.proc].etc; const costParts=[`${f.proc} ${man(cost)}`];
+  const gained=(meHusband?isha:0)+Math.max(0,myBunyo); const succ=Math.round(gained*SUCCESS);
+  if(gained>0){ cost+=succ; costParts.push(`成功報酬 ${man(gained)}×12% ＝ ${man(succ)}`); } let cWhy2=`${f.proc}で決着：${COST[f.proc].txt}（あなたの分）。金額は弁護士ドットコムの集計（2026年6月）の中央値。弁護士費用は原則それぞれが自分で払い、受け取ったお金があればその10〜16%ほどを成功報酬として払う（ここでは12%）。`;
+  if(f.fight){ cost+=CUSTODY_FIGHT; costParts.push(`親権の争い ${man(CUSTODY_FIGHT)}`); cWhy2+=` 親権を争ったので、追加の着手金 約22万円＋調停が長引いた分の日当 約3万円×3回（弁護士事務所の例をもとにした目安）。家庭裁判所の調査官による調査は無料。両方が弁護士をつけるので、相手も同じくらいかかる。`; }
+  if(meHusband && fakes.length){
+    cost+=DNA_PRIVATE; costParts.push(`DNA鑑定（自分で）${man(DNA_PRIVATE)}`); cWhy2+=` 最初に自分でDNA鑑定 約${DNA_PRIVATE}万円。`;
+    if(denied.length){ const d=DNA_LEGAL+DENY_LAWYER; cost+=d; costParts.push(`否認の手続き ${man(d)}`); cWhy2+=` 否認の手続きで裁判用のDNA鑑定 約${DNA_LEGAL}万円＋弁護士 約${DENY_LAWYER}万円（弁護士は仮の目安）。`; }
+  }
+  net -= cost;
+  items.push({f:costParts.length>1?costParts.join(" ＋ ")+` ＝ ${man(cost)}`:"",what:"手続きの費用",amt:"−"+man(cost),law:"目安",why:cWhy2});
+  return {items,net,isha,hPays,supTot,supMonth,supToMe,supFromMe,supYears,supPayer,cost,denied,stuck,liveWith,meHusband,kidsWithWife,kidsWithHusband};
+}
+// 親権が父に行く見込み（%）。裁判所の判断基準：監護の継続性（主に誰が育ててきたか・いま誰と住んでいるか）、15歳以上の子の意見、兄弟を分けない。浮気・托卵をした側かどうかは親権には原則関係しない
+function custodyChance(f){
+  const real=f.kids.filter(k=>!k.fake); const reasons=[]; let p=10;
+  reasons.push("出発点：裁判所で親権を決めた離婚では、父が親権者になるのは約1割");
+  if(f.mainCare==="夫"){ p=70; reasons.push("主に育ててきたのは夫（監護の継続性）：大きくプラス"); }
+  else if(f.mainCare==="ふたり"){ p=30; reasons.push("ふたりで同じくらい育ててきた：少しプラス"); }
+  else reasons.push("主に育ててきたのは妻（監護の継続性）：父には不利");
+  if(f.nowWith==="夫"){ p+=20; reasons.push("発覚後、子どもはいま夫と住んでいる（いまの暮らしを変えない）：プラス"); }
+  else { p-=5; reasons.push("発覚後、子どもはいま妻と住んでいる：マイナス"); }
+  if(real.some(k=>k.age>=15)){ if(f.kidWish==="父"){ p+=20; reasons.push("15歳以上の子が「父と暮らしたい」と言った（裁判所は必ず意見を聴く）：プラス"); } else { p-=20; reasons.push("15歳以上の子が「母と暮らしたい」と言った：マイナス"); } }
+  if(real.some(k=>k.age<3) && f.mainCare!=="夫"){ p-=3; reasons.push("3歳未満の子がいて、母が主に見てきた：少しマイナス"); }
+  if(f.kids.some(k=>k.fake)) reasons.push("妻が托卵したことは、親権の判断には原則関係しない（親としての適性とは別の話とされる）");
+  return {p:Math.max(3,Math.min(90,p)),reasons};
+}
+function worst(res,f){
+  let p=0;
+  if(res.meHusband){
+    p += -res.net/400;
+    p += res.stuck.length*1.2;
+    if(res.liveWith!=="夫") p+=.6;
+    if(res.liveWith==="夫" && res.stuck.length) p+=2;
+  } else {
+    p += 1 - res.net/150;
+    p += res.denied.length*1;
+    if(res.liveWith==="夫") p+=1.5;
+  }
+  return Math.max(1,Math.min(5,Math.round(p)));
+}
+
+// ===== 画面 =====
+function caseNo(){ const d=new Date(); return `令和8年（家）第${String(rint(1000,9999))}号`; }
+function viewTitle(){
+  app.innerHTML=`
+  <div class="caseno"><span>${caseNo()}</span><span>離婚等請求事件（シミュレーション）</span></div>
+  <h1 class="title">托卵離婚<br>シミュレーター</h1>
+  <p class="lead">托卵が発覚したら、お金と子どもはどうなる？　日本の法律（2026年11月時点）と統計にもとづいて計算します。</p>
+  <div class="choices" role="group" aria-label="どちらの事件にしますか">
+    <button class="choice" data-sc="wife" aria-pressed="${S.scenario==="wife"}"><span class="no">事件 一</span><span class="big">妻が托卵していた！</span><span class="who">あなた＝夫</span><span class="mark">${S.scenario==="wife"?"✓":""}</span></button>
+    <button class="choice" data-sc="me" aria-pressed="${S.scenario==="me"}"><span class="no">事件 二</span><span class="big">私の托卵がバレた！</span><span class="who">あなた＝妻</span><span class="mark">${S.scenario==="me"?"✓":""}</span></button>
+  </div>
+  <div class="modes" role="group" aria-label="決め方">
+    <button class="mode" data-md="random" aria-pressed="${S.mode==="random"}"><span class="box"></span><span><b>おまかせ</b><small>年収・子ども・財産をくじで決める</small></span></button>
+    <button class="mode" data-md="manual" aria-pressed="${S.mode==="manual"}"><span class="box"></span><span><b>自分で決める</b><small>数字や子どもを選んで入れる</small></span></button>
+  </div>
+  ${S.scenario?`<button class="go" id="go">${S.mode==="random"?"くじを引く":"書類を書く"}</button>`:`<p class="lead">↑ まず事件を一つ選んでください。</p>`}
+  <button class="ghost" id="guide" style="align-self:flex-start">解説を読む（法律と計算のしくみ）</button>
+  <p class="note">これはゲームです。実際の金額は事情で大きく変わります。本当に困ったときは弁護士に相談してください。</p>`;
+  $("#guide").onclick=()=>viewGuide(viewTitle);
+  app.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{S.scenario=b.dataset.sc;stay(viewTitle);});
+  app.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{S.mode=b.dataset.md;stay(viewTitle);});
+  const go=$("#go"); if(go) go.onclick=()=>{ if(S.mode==="random"){ S.fam=rollFamily(); showReveal(); } else viewForm(); };
+  toTop();
+}
+function viewForm(err){
+  const f=S.inp||{years:8,h:520,w:120,assets:900,hAssets:700,custody:"妻",proc:"調停",mainCare:"妻",nowWith:"妻",kidWish:"母",kids:[{age:5,fake:true},{age:2,fake:false}]};
+  S.inp=f;
+  const ageOpts=a=>Array.from({length:18},(_,i)=>`<option value="${i}" ${i===a?"selected":""}>${i}歳</option>`).join("");
+  app.innerHTML=`
+  <div class="caseno"><span>${S.scenario==="wife"?"事件 一　妻が托卵していた！（あなた＝夫）":"事件 二　私の托卵がバレた！（あなた＝妻）"}</span><button class="ghost" id="back">← 最初へ</button></div>
+  <h1 style="font-size:2rem">家族の書類を書く</h1>
+  <div class="sheet">
+    <h2>ふたりのこと</h2>
+    <div class="field"><label for="years">結婚して何年</label><div class="unit slidewrap"><input class="slide" id="years_r" type="range" min="1" max="40" step="1" value="${Math.min(f.years,40)}" aria-label="スライドで決める"><span class="unit"><input id="years" type="number" min="1" max="40" value="${f.years}">年</span></div></div>
+    <div class="field"><label for="h">夫の年収（税込み）</label><div class="unit slidewrap"><input class="slide" id="h_r" type="range" min="0" max="3000" step="10" value="${Math.min(f.h,3000)}" aria-label="スライドで決める"><span class="unit"><input id="h" type="number" min="0" max="5000" step="10" value="${f.h}">万円</span></div></div>
+    <div class="field"><label for="w">妻の年収（税込み）</label><div class="unit slidewrap"><input class="slide" id="w_r" type="range" min="0" max="3000" step="10" value="${Math.min(f.w,3000)}" aria-label="スライドで決める"><span class="unit"><input id="w" type="number" min="0" max="5000" step="10" value="${f.w}">万円</span></div></div>
+    <div class="field"><label for="assets">結婚後に増えた財産</label><div class="unit slidewrap"><input class="slide" id="assets_r" type="range" min="0" max="10000" step="10" value="${Math.min(f.assets,10000)}" aria-label="スライドで決める"><span class="unit"><input id="assets" type="number" min="0" max="100000" step="10" value="${f.assets}">万円</span></div></div>
+    <div class="hint" style="margin-top:-.4rem">貯金・家・車など、結婚してから増えたもの。結婚前の貯金や親からの相続は入れない。</div>
+    <div class="field"><label for="hAssets">そのうち夫名義</label><div class="unit slidewrap"><input class="slide" id="hAssets_r" type="range" min="0" max="10000" step="10" value="${Math.min(f.hAssets,10000)}" aria-label="スライドで決める"><span class="unit"><input id="hAssets" type="number" min="0" max="100000" step="10" value="${f.hAssets}">万円</span></div></div>
+  </div>
+  <div class="sheet">
+    <h2>子ども（いま住んでいる子）</h2>
+    <div class="kids">${f.kids.map((k,i)=>`<div class="kid"><span class="k">${i+1}人目</span>
+      <select data-i="${i}" class="kage" aria-label="${i+1}人目の年齢">${ageOpts(k.age)}</select>
+      <select data-i="${i}" class="ktype" aria-label="${i+1}人目はどちらの子"><option value="real" ${!k.fake?"selected":""}>夫の本当の子</option><option value="fake" ${k.fake?"selected":""}>托卵の子</option></select>
+      ${f.kids.length>1?`<button class="ghost kdel" data-i="${i}">消す</button>`:""}</div>`).join("")}</div>
+    ${f.kids.length<5?`<button class="ghost" id="kadd" style="align-self:flex-start">＋ 子どもを足す</button>`:""}
+  </div>
+  <div class="sheet">
+    <h2>決まり方</h2>
+    <div class="field"><label for="custody">親権</label><select id="custody">${["妻","夫","共同"].map(c=>`<option ${c===f.custody?"selected":""} value="${c}">${c==="共同"?"共同親権（子は妻と暮らす）":c+"が親権を持つ"}</option>`).join("")}</select></div>
+    <div class="field"><label for="mainCare">主に育ててきた人</label><select id="mainCare">${["妻","夫","ふたり"].map(c=>`<option ${c===f.mainCare?"selected":""} value="${c}">${c==="ふたり"?"ふたりで同じくらい":c}</option>`).join("")}</select></div>
+    <div class="field"><label for="nowWith">いま子どもと住む人</label><select id="nowWith">${["妻","夫"].map(c=>`<option ${c===f.nowWith?"selected":""}>${c}</option>`).join("")}</select></div>
+    <div class="field"><label for="kidWish">15歳以上の子の気持ち</label><select id="kidWish">${["母","父"].map(c=>`<option ${c===f.kidWish?"selected":""} value="${c}">${c}と暮らしたい</option>`).join("")}</select></div>
+    <div class="hint" style="margin-top:-.4rem">上の3つは、本当の子の親権を争ったときに使う。「親権」は争わなかったときの決まり方。</div>
+    <div class="field"><label for="proc">どこで決着</label><select id="proc">${["協議","調停","裁判"].map(c=>`<option ${c===f.proc?"selected":""}>${c}</option>`).join("")}</select></div>
+    <div class="hint" style="margin-top:-.4rem">協議＝ふたりの話し合い、調停＝家庭裁判所で話し合い、裁判＝裁判所が決める。</div>
+  </div>
+  ${err?`<p class="err">${esc(err)}</p>`:""}
+  <button class="go" id="go">発覚させる</button>`;
+  const read=()=>{ const n=id=>Math.max(0,Number($("#"+id).value)||0);
+    f.years=Math.max(1,n("years")); f.h=n("h"); f.w=n("w"); f.assets=n("assets"); f.hAssets=Math.min(n("hAssets"),f.assets);
+    f.custody=$("#custody").value; f.proc=$("#proc").value; f.mainCare=$("#mainCare").value; f.nowWith=$("#nowWith").value; f.kidWish=$("#kidWish").value;
+    app.querySelectorAll(".kage").forEach(s=>f.kids[s.dataset.i].age=Number(s.value));
+    app.querySelectorAll(".ktype").forEach(s=>f.kids[s.dataset.i].fake=s.value==="fake"); };
+  ["years","h","w","assets","hAssets"].forEach(id=>{ const n=$("#"+id), r=$("#"+id+"_r");
+    r.oninput=()=>{ n.value=r.value; if(id==="assets"){ $("#hAssets_r").max=r.value; if(+$("#hAssets").value>+r.value){ $("#hAssets").value=r.value; $("#hAssets_r").value=r.value; } } };
+    n.oninput=()=>{ r.value=Math.min(+n.value||0,+r.max); }; });
+  $("#hAssets_r").max=Math.max(10,f.assets);
+  $("#back").onclick=()=>{read();viewTitle();};
+  const add=$("#kadd"); if(add) add.onclick=()=>{read();f.kids.push({age:0,fake:false});stay(()=>viewForm());};
+  app.querySelectorAll(".kdel").forEach(b=>b.onclick=()=>{read();f.kids.splice(Number(b.dataset.i),1);stay(()=>viewForm());});
+  $("#go").onclick=()=>{ read();
+    if(!f.kids.some(k=>k.fake)) return stay(()=>viewForm("托卵の子を少なくとも1人入れてください。"));
+    if(f.kids.some(k=>k.age>=f.years+1&&k.fake)) return stay(()=>viewForm("托卵の子の年齢が結婚年数より上です。結婚中に生まれた子にしてください。"));
+    S.fam={...f,kids:f.kids.map(k=>({...k})),style:f.h===0?"主夫":f.w===0?"専業主婦":"共働き",wJob:""};
+    showReveal(); };
+  toTop();
+}
+function showReveal(){
+  const meH=S.scenario==="wife";
+  const fakeN=S.fam.kids.filter(k=>k.fake).length;
+  const d=document.createElement("div"); d.className="reveal"; d.setAttribute("role","button"); d.tabIndex=0;
+  d.innerHTML=`<div class="inner"><div class="cry">${meH?"妻が<br>托卵していた！":"私の托卵が<br>バレた！"}</div>
+  <div class="sub">${meH?`DNA鑑定の結果、子ども${S.fam.kids.length}人のうち${fakeN}人はあなたの子ではなかった。`:`夫がDNA鑑定をした。子ども${S.fam.kids.length}人のうち${fakeN}人が夫の子ではないと知られた。`}</div>
+  <div class="tap">画面を押して 精算へ ▶</div></div>`;
+  document.body.appendChild(d); d.focus();
+  const close=()=>{ d.remove(); S.fam.fight=null; const real=S.fam.kids.filter(k=>!k.fake);
+    if(real.length && (S.scenario==="wife" || R()<.3)) viewFight(); else { S.res=calc(S.fam,S.scenario); S.step=0; viewSettle(); } };
+  d.onclick=close; d.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();close();} };
+}
+function viewFight(){
+  const f=S.fam, meH=S.scenario==="wife", real=f.kids.filter(k=>!k.fake), c=custodyChance(f);
+  const kidsTxt=real.map(k=>k.age+"歳").join("、");
+  const care={妻:"妻",夫:"夫",ふたり:"ふたりで同じくらい"}[f.mainCare];
+  const go=()=>{ S.res=calc(S.fam,S.scenario); S.step=0; viewSettle(); };
+  app.innerHTML=`
+  <div class="caseno"><span>${meH?"事件 一　妻が托卵していた！":"事件 二　私の托卵がバレた！"}</span><span>親権</span></div>
+  <h1 style="font-size:2rem">${meH?"本当の子の親権を争う？":"夫が本当の子の親権を求めてきた"}</h1>
+  ${familyHtml(f)}
+  <div class="sheet">
+    <h2>いまの状況</h2>
+    <div>本当の子：${kidsTxt}</div>
+    <div>主に育ててきた人：${care}</div>
+    <div>発覚後、子どもがいま住んでいる家：${f.nowWith}の家</div>
+    ${real.some(k=>k.age>=15)?`<div>15歳以上の子の気持ち：${f.kidWish==="父"?"父と暮らしたい":"母と暮らしたい"}</div>`:""}
+  </div>
+  <div class="sheet">
+    <h2>弁護士の見立て：父が親権を取れる見込み 約${c.p}%</h2>
+    <ul class="lines">${c.reasons.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+  </div>
+  <div class="next" id="fightbtns">${meH?`<button class="go" id="fight">争う</button><button class="ghost" id="nofight">争わない（妻に任せる）</button>`:`<button class="go" id="fight">受けて立つ</button>`}</div>
+  <div id="fightres"></div>`;
+  $("#fight").onclick=()=>{
+    const won=R()*100<c.p; f.fight={p:c.p,won};
+    $("#fightbtns").remove();
+    const meWon = meH?won:!won;
+    $("#fightres").innerHTML=`<div class="verdict" style="margin-top:.5rem"><span class="label">家庭裁判所の判断</span><span class="total" style="font-size:clamp(2rem,6vw,3.2rem)">${won?"親権は夫に":"親権は妻に"}</span><span class="lead" style="color:var(--ink);font-weight:700">${meWon?"あなたは親権を守った（取れた）":"あなたは親権を失った（取れなかった）"}</span><div class="next"><button class="go" id="tosettle">精算へ ▶</button></div></div>`;
+    $("#tosettle").onclick=go; $("#tosettle").focus();
+  };
+  const nf=$("#nofight"); if(nf) nf.onclick=go;
+  toTop();
+}
+function familyHtml(f){
+  const meH=S.scenario==="wife";
+  const job=(v,j)=>v>0?`年収 <b class="num">${man(v)}</b>${j?"（"+j+"）":""}`:"収入なし";
+  return `<div class="family">
+    <div class="person ${meH?"me":""}"><div class="role">夫</div><div class="nm">${f.style==="主夫"?"主夫":"会社員"}</div><div>${job(f.h,"")}</div></div>
+    <div class="person ${meH?"":"me"}"><div class="role">妻</div><div class="nm">${f.style==="専業主婦"?"専業主婦":f.wJob||(f.w>0?"働いている":"専業主婦")}</div><div>${job(f.w,"")}</div></div>
+    <div class="person"><div class="role">子ども ${f.kids.length}人</div><div>${f.kids.map(k=>`<div>${k.age}歳<span class="kidtag ${k.fake?"fake":""}">${k.fake?"托卵の子":"本当の子"}</span></div>`).join("")}</div></div>
+    <div class="person"><div class="role">結婚 ${f.years}年</div><div>結婚後の財産 <b class="num">${man(f.assets)}</b></div><div style="font-size:.85rem;color:var(--sub)">夫名義 ${man(f.hAssets)}／妻名義 ${man(f.assets-f.hAssets)}</div></div>
+  </div>`;
+}
+function viewSettle(){
+  const r=S.res, f=S.fam, shown=r.items.slice(0,S.step+1), done=S.step>=r.items.length-1;
+  app.innerHTML=`
+  <div class="caseno"><span>${S.scenario==="wife"?"事件 一　妻が托卵していた！":"事件 二　私の托卵がバレた！"}</span><span>決着：${f.proc}</span></div>
+  <h1 style="font-size:2rem">配られた家族</h1>
+  ${familyHtml(f)}
+  <h2 style="font-size:1.6rem">精算書</h2>
+  <div class="items">${shown.map((it,i)=>`<div class="item"><span class="ix">${"一二三四五六七八九十"[i]}</span><span class="what">${esc(it.what)}<span class="law">${esc(it.law)}</span></span><span class="amt num">${esc(it.amt)}</span><span class="why">${esc(it.why)}</span>${it.f?`<pre class="calc num">${esc(it.f)}</pre>`:""}</div>`).join("")}</div>
+  <div class="next">${done?`<button class="go" id="verdict">判決を見る</button>`:`<button class="go" id="nx">次の項目 ▶</button><button class="ghost" id="all">全部見る</button>`}</div>`;
+  const nx=$("#nx"); if(nx) nx.onclick=()=>{S.step++;viewSettle();window.scrollTo(0,document.body.scrollHeight);};
+  const all=$("#all"); if(all) all.onclick=()=>{S.step=r.items.length-1;viewSettle();};
+  const v=$("#verdict"); if(v) v.onclick=viewVerdict;
+  if(nx) nx.focus(); else if(v) v.focus();
+}
+function viewVerdict(){
+  const r=S.res, f=S.fam, w=worst(r,f), meH=r.meHusband;
+  const lines=[];
+  if(meH){
+    if(r.supToMe>0) lines.push(`妻から養育費 月 ${yen(r.supMonth)}（子どものためのお金なので、上の増減には入れていない）。`);
+    if(r.stuck.length) lines.push(`他人の子 ${r.stuck.length}人の法律上の父親のまま。`+(r.liveWith==="夫"?"自分の家で育てる。":"20歳まで養育費を払う。"));
+    if(r.denied.length) lines.push(`否認できた托卵の子 ${r.denied.length}人とは、親子ではなくなった。`);
+    if(r.liveWith!=="夫" && f.kids.some(k=>!k.fake)) lines.push("本当の子とは別々に暮らす。会えるかは親子交流の取り決めしだい。");
+    if(r.hPays>0) lines.push(`托卵した妻に、財産の半分として ${man(r.hPays)} を渡した。`);
+  } else {
+    lines.push(`夫に慰謝料 ${man(r.isha)} を払う。`);
+    if(r.denied.length) lines.push(`托卵の子 ${r.denied.length}人は夫の子ではなくなった。その子の養育費は夫からもらえない。`);
+    if(r.stuck.length) lines.push(`托卵の子 ${r.stuck.length}人は、法律上は夫の子のまま。`);
+    if(r.liveWith==="夫") lines.push("子どもは夫の家で暮らすことになった。");
+    if(r.supToMe>0) lines.push(`夫から養育費 月 ${yen(r.supMonth)}（子どものためのお金なので、上の増減には入れていない）。`);
+  }
+  app.innerHTML=`
+  <div class="caseno"><span>${S.scenario==="wife"?"事件 一　妻が托卵していた！（あなた＝夫）":"事件 二　私の托卵がバレた！（あなた＝妻）"}</span><span>判決</span></div>
+  <div class="verdict">
+    <div class="stamp"><div><small>最悪度</small><b>${w}</b><small>5段階</small></div></div>
+    <span class="label">判決</span>
+    <span class="total num">あなたは<br>${man(Math.abs(r.net))}を${r.net>=0?"得た":"失った"}</span>
+    <span style="font-weight:700;border:2px solid var(--ink);padding:.15rem .6rem;align-self:flex-start">※ この金額は目安です</span>
+    <span class="lead" style="font-size:1.25rem;color:var(--ink);font-weight:700">${r.supFromMe>0?`毎月の養育費 ${yen(r.supMonth)} を払う（あと${r.supYears}年）`:r.supToMe>0?`毎月の養育費 ${yen(r.supMonth)} を受け取る（あと${r.supYears}年）`:"養育費のやりとりはなし"}</span>
+    <div class="rows num">
+      <span>慰謝料</span><span>${meH?"＋":"−"}${man(r.isha)}</span>
+      <span>財産分与</span><span>${sign(meH?-r.hPays:r.hPays)}${man(Math.abs(r.hPays))}</span>
+      ${r.supFromMe>0?`<span>養育費を払う（20歳までの合計）</span><span>−${man(r.supFromMe)}</span>`:""}
+      <span>手続きの費用</span><span>−${man(r.cost)}</span>
+    </div>
+    ${lines.length?`<ul class="lines">${lines.map(l=>`<li>${esc(l)}</li>`).join("")}</ul>`:""}
+  </div>
+  <div class="next"><a class="go" id="post" target="_blank" rel="noopener" style="text-decoration:none" href="${postUrl(r,w,meH)}">結果をXにポストする</a><button class="ghost" id="copy">リンクをコピー</button><span id="copied" class="lead" aria-live="polite"></span></div>
+  <div class="next"><button class="go" id="again">${S.mode==="random"?"もう一回くじを引く":"数字を変えてやり直す"}</button><button class="ghost" id="swap">${meH?"妻の側でやってみる（私の托卵がバレた！）":"夫の側でやってみる（妻が托卵していた！）"}</button><button class="ghost" id="guide">解説を読む</button><button class="ghost" id="top">最初へ</button></div>
+  <p class="note">これはゲームです。慰謝料の上乗せと年収のくじはゲーム用の目安、弁護士費用は弁護士ドットコムの集計（2026年6月）の中央値で、養育費は裁判所の算定表（2019年版）の式で計算しています。嫡出否認は2024年4月以降に生まれた子のルール（3年）で数えています。実際の金額は事情で大きく変わるので、本当に困ったときは弁護士に相談してください。</p>`;
+  $("#again").onclick=()=>{ if(S.mode==="random"){ S.fam=rollFamily(); showReveal(); } else viewForm(); };
+  $("#top").onclick=viewTitle;
+  $("#guide").onclick=()=>viewGuide(viewVerdict);
+  $("#swap").onclick=()=>{ S.scenario=meH?"me":"wife"; if(S.mode==="random"){ S.fam=rollFamily(); showReveal(); } else viewForm(); };
+  $("#copy").onclick=()=>{ const done=t=>{$("#copied").textContent=t;}; try{ navigator.clipboard.writeText(GAME_URL).then(()=>done("コピーしました"),()=>done(GAME_URL)); }catch(e){ done(GAME_URL); } };
+  toTop();
+}
+const GAME_URL="https://ore-tarou.github.io/takuran-sim/";
+function postUrl(r,w,meH){
+  const sup=r.supFromMe>0?`毎月の養育費 ${yen(r.supMonth)} を払う`:r.supToMe>0?`毎月の養育費 ${yen(r.supMonth)} を受け取る`:"養育費なし";
+  const text=`【托卵離婚シミュレーター】${meH?"妻が托卵していた！":"私の托卵がバレた！"}\nあなたは ${man(Math.abs(r.net))} を${r.net>=0?"得た":"失った"}。\n${sup}。\n最悪度 ${w}/5\n#托卵離婚シミュレーター`;
+  return "https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(GAME_URL);
+}
+function viewGuide(back){
+  const L=(t,u)=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
+  app.innerHTML=`
+  <div class="caseno"><span>托卵離婚シミュレーター</span><button class="ghost" id="gback">← もどる</button></div>
+  <h1 style="font-size:2.2rem">解説</h1>
+  <p class="lead">このゲームの計算は、2026年11月時点の日本の法律と、公開されている統計・相場にもとづいています。項目ごとに「何で決まるか」をまとめました。</p>
+  <div class="sheet guide">
+    <h2>一　托卵の子は「否認」できるか（嫡出否認）</h2>
+    <p>結婚している間に生まれた子は、法律上まず夫の子とされます（民法772条、嫡出推定）。「自分の子ではない」と裁判で認めてもらう手続きが嫡出否認です（民法774条・777条）。</p>
+    <ul class="lines"><li>2024年4月1日から、訴えられる期間が1年から3年に伸びました。父は「子の生まれを知った時から3年」。</li><li>子と母も否認を申し立てられるようになりました。</li><li>3年が過ぎると、DNA鑑定で他人の子と分かっても、法律上は夫の子のままです。親権がなくても養育費を払う立場になります。</li><li>ゲームでは「生まれた時に知った」として、3歳未満なら否認できる、3歳以上ならできない、としています。</li></ul>
+  </div>
+  <div class="sheet guide">
+    <h2>二　慰謝料</h2>
+    <p>心の傷へのつぐないのお金です（民法709条・710条）。托卵で離婚する場合の目安は200万〜300万円で、妻と浮気相手を合わせた額です。二人から満額ずつ取れるわけではありません。</p>
+    <ul class="lines"><li>金額に効くのは、結婚していた年数、離婚に至ったか、不貞の期間や悪質さなど。</li><li>払う側の収入の影響は、判決の分析では「小さい」とされています。</li><li>ゲームの上乗せ（結婚年数・子の数・収入）はゲーム用の計算で、上限300万円＋収入で最大50万円です。</li><li>請求できるのは離婚から3年以内です（民法724条）。</li></ul>
+  </div>
+  <div class="sheet guide">
+    <h2>三　財産分与</h2>
+    <p>結婚してから増えた財産（貯金・家・車など）を、原則半分ずつに分けます（民法768条）。結婚前の貯金や親からの相続は入りません。</p>
+    <ul class="lines"><li><b>托卵・浮気をした側でも、半分もらえます。</b>慰謝料とは別の話だからです。だから「裏切られた夫が、托卵した妻にお金を渡す」ことが起きます。</li><li>2026年4月から、請求できる期間が離婚後2年から5年に伸びました。</li></ul>
+  </div>
+  <div class="sheet guide">
+    <h2>四　養育費</h2>
+    <p>子どもと暮らさない親が、子どもの生活費として払います（民法766条・877条）。金額は裁判所の「算定表」（2019年版）で決まり、その中身は次の式です。</p>
+    <pre class="calc num" style="margin:0;padding:.6rem .8rem;background:var(--paper);border-left:3px solid var(--ink);white-space:pre-wrap;font-family:var(--body);font-size:.85rem">基礎収入 ＝ 年収 × 基礎収入割合（年収で38〜54%）
+子の生活費 ＝ 払う人の基礎収入 × 生活指数 ÷ (100＋生活指数)
+年額 ＝ 子の生活費 × 払う人の基礎収入 ÷ (払う人＋もらう人の基礎収入)
+生活指数：14歳以下 62、15歳以上 85</pre>
+    <ul class="lines"><li>ふつうは子どもが20歳になるまで払います。</li><li>2026年4月から、取り決めがなくても子1人につき月2万円を請求できる「法定養育費」ができました。文書で決めた養育費は、裁判なしで給料の差し押さえに進めます。</li></ul>
+  </div>
+  <div class="sheet guide">
+    <h2>五　親権と共同親権</h2>
+    <p>離婚で親権を決めると、子のいる離婚の86.5%で妻が全員の親権を持ちます（2024年）。裁判所で決めた場合も、父が親権者になるのは約1割です。</p>
+    <ul class="lines"><li>いちばん重く見られるのは「いままで主に誰が育ててきたか」「いまの暮らしを変えないか」（監護の継続性）。</li><li>15歳以上の子は、裁判所が必ず本人の意見を聴きます。兄弟はなるべく分けません。</li><li><b>浮気や托卵をしたことは、親権の判断には原則関係しません。</b>夫婦の問題と、親としての適性は別とされるからです。</li><li>2026年4月から、離婚後も父母の両方が親権を持つ「共同親権」が選べます。DVや虐待のおそれがあれば、必ずどちらか一人になります。</li><li>ゲームの「取れる見込み（％）」は、これらの点を足し引きしたゲーム用の目安です。</li></ul>
+  </div>
+  <div class="sheet guide">
+    <h2>六　弁護士費用とDNA鑑定</h2>
+    <ul class="lines"><li>弁護士費用（着手金＋報酬金の中央値）：協議 約44万円、調停 約60万円、裁判 約66万円。原則それぞれが自分で払います。</li><li>お金を受け取った側は、その10〜16%ほどを成功報酬として払います（ゲームでは12%）。</li><li>DNA鑑定：自分で調べる鑑定 約2.5万〜5万円、裁判で使う鑑定 約7万〜20万円。</li><li>嫡出否認の調停の申し立ては、収入印紙1,200円。</li><li>親権を争うと、話し合いでは済まず調停以上になり、追加の着手金（例：約22万円）や、長引いた回の日当（例：1回約3万円）がかかります。ゲームでは合わせて約31万円。家庭裁判所の調査官の調査は無料です。</li></ul>
+  </div>
+  <div class="sheet guide">
+    <h2>七　くじの確率</h2>
+    <ul class="lines"><li>共働き 約74%、専業主婦 約25%（2025年 労働力調査）。主夫はまれなので1%にしています。</li><li>共働きの妻は、パートが半分強。夫の年収のばらつきは、ゲーム用の目安です。</li></ul>
+  </div>
+  <div class="sheet guide">
+    <h2>八　托卵はどのくらいあるのか</h2>
+    <p>「子どもの1割は托卵」という話をよく聞きますが、研究ではもっと少ないという結果が多く出ています。</p>
+    <ul class="lines"><li>西ヨーロッパの研究では、子どもの約1〜2%（2016年・2019年の研究）。</li><li>ベルギーとオランダの500年分の家系図とDNAを照らし合わせた研究では、平均 約1.6%。農村の富裕な家では約0.4%、大都市では2.3%、19世紀後半の都市の貧しい家では約5.9%まで上がりました（2019年）。</li><li>17の研究をまとめた分析では、ふつうの人では中央値 3.7%、もともと疑ってDNA鑑定を申し込んだ人では中央値 26.9%（2005年）。「1〜3割」の話は、この疑って調べた人たちの数字に近いものです。</li><li>「10%」の話は、1991年の医学誌の論文がもとだと考えられています。</li><li>日本では、大きな調査の公開データは見つかっていません。</li><li>このゲームは「托卵があった家」だけを配っています。本当にこうなるのは、子ども100人に1〜2人ほどというのが研究の結果です。</li></ul>
+  </div>
+  <div class="sheet guide">
+    <h2>出典</h2>
+    <ul class="lines">
+      <li>${L("法務省：嫡出推定・嫡出否認の見直し","https://www.moj.go.jp/MINJI/minji07_00315.html")}</li>
+      <li>${L("文京区：離婚後の子の養育に関する民法改正","https://www.city.bunkyo.lg.jp/b024/p007534.html")}、${L("杉並区","https://www.city.suginami.tokyo.jp/s053/23907.html")}</li>
+      <li>${L("養育費の計算式（算定表 2019年版）","https://www.asahi-net.or.jp/~zi3h-kwrz/law2chsp.html")}</li>
+      <li>${L("弁護士ドットコム：離婚の弁護士費用","https://www.bengo4.com/c_3/guides/1924/")}、${L("托卵が発覚したら","https://www.bengo4.com/c_3/guides/takuran/")}</li>
+      <li>${L("デイライト法律事務所：慰謝料の相場","https://www.daylight-law.jp/divorce/isyaryou/marketprice")}、${L("親権","https://www.daylight-law.jp/divorce/50002/shinken/")}</li>
+      <li>${L("みずほ中央法律事務所：不貞慰謝料の判決分析","https://www.mc-law.jp/rikon/27542/")}、${L("DNA鑑定の費用","https://www.mc-law.jp/rikon/21433")}</li>
+      <li>${L("国立社会保障・人口問題研究所：親権を行う者別の離婚","https://www.ipss.go.jp/syoushika/tohkei/Data/Popular2026/T06-14.files/sheet001.htm")}</li>
+      <li>${L("労働政策研究・研修機構：共働き世帯","https://www.jil.go.jp/kokunai/statistics/qa/a07.html")}</li>
+      <li>${L("裁判所：嫡出否認の調停","https://www.courts.go.jp/saiban/syurui/syurui_kazi/kazi_07_15/")}</li>
+      <li>${L("Larmuseauほか 2016年（EurekAlertの紹介）","https://www.eurekalert.org/news-releases/794969")}</li>
+      <li>${L("ナゾロジー：500年分の家系とDNAの研究（Current Biology 2019年）","https://nazology.kusuguru.co.jp/archives/172963")}</li>
+      <li>${L("ヒロクリニック：他人の子を育てている確率（Bellisほか 2005年の分析を紹介）","https://www.hiro-clinic.or.jp/nippt/chance-that-you-will-raise-a-child-that-is-not-your-own/")}</li>
+    </ul>
+  </div>
+  <p class="note">これはゲームです。実際の金額や結果は、それぞれの事情で大きく変わります。本当に困ったときは弁護士に相談してください。</p>
+  <button class="go" id="gback2">← もどる</button>`;
+  $("#gback").onclick=back; $("#gback2").onclick=back;
+  toTop();
+}
+viewTitle();
+</script>
+
+</body>
+</html>
