@@ -632,7 +632,7 @@ function calc(f,scenario){
   items.push({f:costParts.length>1?costParts.join(" ＋ ")+` ＝ ${man(cost)}`:"",what:"手続きの費用",amt:"−"+man(cost),law:"目安",why:cWhy2});
   (f.xItems||[]).filter(x=>x.amt).forEach(x=>{ net-=x.amt; items.push({what:x.what,amt:"−"+man(x.amt),law:x.law||"目安",why:x.why}); });
   const supStuckNote = !f.hidden && meHusband && supFromMe>0 && stuck.some(k=>kidsWithWife.includes(k)) ? `。この中には、否認できなかった托卵の子（${stuck.filter(k=>kidsWithWife.includes(k)).map(k=>k.age+"歳").join("、")}）の分も入っている` : "";
-  return {hAmt:f.hAmt||150,wAff:!!f.wAff,hAff:!!f.hAff,hidden:!!f.hidden,extra:f.extra||0,supStuckNote,items,net,konMe,konMonth,mo,konPayer,isha,hPays,supTot,supMonth,supToMe,supFromMe,supYears,supPayer,cost,denied,stuck,liveWith,meHusband,kidsWithWife,kidsWithHusband};
+  return {hAmt:f.hAmt||150,wAff:!!f.wAff,hAff:!!f.hAff,hidden:!!f.hidden,extra:f.extra||0,supStuckNote,items,net:net+supToMe-supFromMe,net0:net,konMe,konMonth,mo,konPayer,isha,hPays,supTot,supMonth,supToMe,supFromMe,supYears,supPayer,cost,denied,stuck,liveWith,meHusband,kidsWithWife,kidsWithHusband};
 }
 // 離婚しない：浮気相手に慰謝料、托卵の子は否認できるならする
 const STAY_ISHA=100, STAY_LAWYER=22; // 離婚しない不貞慰謝料の目安 50〜150万（托卵なので高め）、着手金 約22万
@@ -692,12 +692,12 @@ function worst(res,f){
   let p=0;
   if(res.stay) return Math.max(1,Math.min(5,1+res.stuck.length+(res.stuck.length?1:0)));
   if(res.meHusband){
-    p += -res.net/400;
+    p += -(res.net0??res.net)/400;
     p += res.stuck.length*1.2;
     if(res.liveWith!=="夫") p+=.6;
     if(res.liveWith==="夫" && res.stuck.length) p+=2;
   } else {
-    p += 1 - res.net/150;
+    p += 1 - (res.net0??res.net)/150;
     p += res.denied.length*1;
     if(res.liveWith==="夫") p+=1.5;
   }
@@ -1360,7 +1360,7 @@ function viewSettle(){
 function evalPaths(){
   const base=S.fam, sc=S.scenario, meH=sc==="wife";
   const real=base.kids.some(k=>!k.fake), c=custodyChance(base).p, q=c/100;
-  const run=mod=>{ const f=JSON.parse(JSON.stringify(base)); f.stay=false; f.pretend=false; f.fight=null; mod(f); const r=calc(f,sc); return r.net-r.supFromMe-(meH?(r.stay?r.fut.total:futureCost(f,r.kidsWithHusband||[],false).total):0); };
+  const run=mod=>{ const f=JSON.parse(JSON.stringify(base)); f.stay=false; f.pretend=false; f.fight=null; mod(f); const r=calc(f,sc); return r.net-(meH?(r.stay?r.fut.total:futureCost(f,r.kidsWithHusband||[],false).total):0); };
   const fightEV=(proc)=>q*run(f=>{f.proc=proc;f.fight={p:c,won:true};})+(1-q)*run(f=>{f.proc=proc;f.fight={p:c,won:false};});
   const rows=[];
   if(meH){
@@ -1445,17 +1445,18 @@ function viewVerdict(){
       ${r.pretend?"":`<span>慰謝料${r.stay?"（浮気相手から）":""}</span><span>${r.hidden?(r.wAff?(meH?"＋":"−")+man(200):r.hAff?(meH?"−":"＋")+man(r.hAmt):"0円"):(meH?"＋":"−")+man(r.isha)}</span>`}
       ${r.stay?"":`<span>財産分与</span><span>${sign(meH?-r.hPays:r.hPays)}${man(Math.abs(r.hPays))}</span>`}
             ${r.konMe?`<span>婚姻費用（離婚までの${r.mo}か月）</span><span>${r.konMe>0?"＋":"−"}${man(Math.abs(r.konMe))}</span>`:""}
+      ${r.supFromMe>0||r.supToMe>0?`<span>養育費（20歳までの合計）</span><span>${r.supToMe>0?"＋":"−"}${man(r.supFromMe||r.supToMe)}</span>`:""}
       <span>手続きの費用</span><span>−${man(r.cost)}</span>
       ${r.extra?`<span>口止めに払ったお金</span><span>−${man(r.extra)}</span>`:""}
     </div>
     ${r.stay&&r.fut&&r.fut.total>0?`<div class="sheet" style="margin:0"><b>これからの生活費（上の金額とは別）</b><br>子どもと妻の生活費として、夫の負担は毎月 約${yen(r.fut.month)}。下の子が20歳になるまでで、合計 約${man(r.fut.total)}（子ども ${man(r.fut.kid.total)} ＋ 妻 ${man(r.fut.wife.total)}）</div>`:""}
-    ${r.supFromMe>0||r.supToMe>0?`<div class="sheet" style="margin:0"><b>養育費（上の金額とは別）</b><br>${r.supFromMe>0?"払う":"受け取る"}：毎月 ${yen(r.supMonth)}、下の子が20歳になるまで ${r.supYears}年、合計 約${man(r.supFromMe||r.supToMe)}${r.supStuckNote||""}</div>`:""}
+    ${r.supFromMe>0||r.supToMe>0?`<div class="sheet" style="margin:0"><b>養育費（上の金額に入っている）</b><br>${r.supFromMe>0?"払う":"受け取る"}：毎月 ${yen(r.supMonth)}、下の子が20歳になるまで ${r.supYears}年、合計 約${man(r.supFromMe||r.supToMe)}${r.supStuckNote||""}</div>`:""}
     ${lines.length?`<ul class="lines">${lines.map(l=>`<li>${esc(l)}</li>`).join("")}</ul>`:""}
   </div>
   ${r.hidden?"":optimalHtml()}
   <div class="next"><a class="go" id="post" target="_blank" rel="noopener" style="text-decoration:none" href="${postUrl(r,w,meH)}">結果をXにポストする</a><button class="ghost" id="copy">リンクをコピー</button><span id="copied" class="lead" aria-live="polite"></span></div>
   <div class="next"><button class="ghost" id="again">${S.mode==="random"?"もう一回あそぶ":"数字を変えてやり直す"}</button><button class="ghost" id="swap">${meH?"妻の側でやってみる（私の托卵がバレた！）":"夫の側でやってみる（妻が托卵していた！）"}</button><button class="ghost" id="guide">解説を読む</button><button class="backbtn" id="top">← 最初へもどる</button></div>
-  <p class="note">これはゲームです。慰謝料の上乗せと年収のくじはゲーム用の目安、弁護士費用は弁護士ドットコムの集計（2026年6月）の中央値で、養育費は裁判所の算定表（2019年版）の式で計算しています。嫡出否認は、2024年4月以降に生まれた子は「知ってから3年」、それより前に生まれた子は「知ってから1年」の決まりです（ゲームでは2歳以下を否認できる子としています）。養育費は最後の金額とは別に出しています。実際の金額は事情で大きく変わるので、本当に困ったときは弁護士に相談してください。</p>`;
+  <p class="note">これはゲームです。慰謝料の上乗せと年収のくじはゲーム用の目安、弁護士費用は弁護士ドットコムの集計（2026年6月）の中央値で、養育費は裁判所の算定表（2019年版）の式で計算しています。嫡出否認は、2024年4月以降に生まれた子は「知ってから3年」、それより前に生まれた子は「知ってから1年」の決まりです（ゲームでは2歳以下を否認できる子としています）。養育費は、20歳までの合計を最後の金額に入れています。実際の金額は事情で大きく変わるので、本当に困ったときは弁護士に相談してください。</p>`;
   $("#again").onclick=()=>{ if(S.mode==="random"){ startStory(); } else viewForm(); };
   $("#top").onclick=viewTitle;
   $("#guide").onclick=()=>viewGuide(viewVerdict);
