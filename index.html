@@ -1213,7 +1213,7 @@ function viewVerdict(){
   $("#copy").onclick=()=>{ const done=t=>{$("#copied").textContent=t;}; try{ navigator.clipboard.writeText(GAME_URL).then(()=>done("コピーしました"),()=>done(GAME_URL)); }catch(e){ done(GAME_URL); } };
   toTop();
 }
-const GAME_URL="https://ore-tarou.github.io/takuran-sim/";
+const GAME_URL="https://ore-tarou.github.io/takuran-sim/?v=2";
 function postUrl(r,w,meH){
   const sup=r.pretend?"気づかないふりをした":r.stay?"離婚はしなかった":r.supFromMe>0?`毎月の養育費 ${yen(r.supMonth)} を払う`:r.supToMe>0?`毎月の養育費 ${yen(r.supMonth)} を受け取る`:"養育費なし";
   const text=`【托卵離婚シミュレーター】${meH?"妻が托卵していた！":"私の托卵がバレた！"}\nあなたは ${man(Math.abs(r.net))} を${r.net>=0?"得た":"失った"}。\n${sup}。\n#托卵離婚シミュレーター`;
