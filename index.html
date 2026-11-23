@@ -1480,11 +1480,30 @@ function resultImage(){ const v=document.querySelector(".verdict"); const W=1200
   else { x.font="400 29px "+G; const ls=v?[...v.querySelectorAll(".lines li")].map(e=>e.innerText.trim()):[]; for(const l of ls.slice(0,4)){ for(let k=0;k<l.length&&k<72;k+=36){ x.fillText((k?"　":"・")+l.slice(k,k+36)+(k+36<l.length&&k+36>=72?"…":""),70,y); y+=44; } y+=10; } }
   x.fillRect(70,900,1060,2); x.font="400 28px "+G; x.fillText("ore-tarou.github.io/takuran-sim　#托卵離婚シミュレーター",70,922);
   return new Promise(r=>c.toBlob(r,"image/png")); }
+function shareUrl(){ try{ const v=document.querySelector(".verdict"), meH=S.scenario==="wife", tx=(q,n)=>{ const e=v.querySelector(q); return e?e.innerText.trim().slice(0,n):""; };
+    const d={h:meH?1:0,k:(meH?S.lookH:S.lookW)||0,l:tx(".label",30),t:v.querySelector(".total").innerText.split("\n").filter(Boolean).slice(0,3),m:tx(".lead",60),r:[...v.querySelectorAll(".rows span")].map(e=>e.innerText.trim().slice(0,30)).slice(0,14),li:[...v.querySelectorAll(".lines li")].map(e=>e.innerText.trim().slice(0,70)).slice(0,3)};
+    return GAME_URL+"&r="+btoa(unescape(encodeURIComponent(JSON.stringify(d)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }catch(e){ return GAME_URL; } }
+function readShared(){ try{ const r=new URLSearchParams(location.search).get("r"); if(!r) return null; const d=JSON.parse(decodeURIComponent(escape(atob(r.replace(/-/g,"+").replace(/_/g,"/"))))); return d&&Array.isArray(d.t)&&d.t.length?d:null; }catch(e){ return null; } }
+function viewShared(d){ const c=(x,n)=>esc(String(x==null?"":x).slice(0,n||80)).replace(/あなた/g,"この人"), k=+d.k>0&&+d.k<6?+d.k:0, r=Array.isArray(d.r)?d.r.slice(0,14):[], li=Array.isArray(d.li)?d.li.slice(0,3):[];
+  if(d.h) S.lookH=k; else S.lookW=k;
+  app.innerHTML=`
+  <div class="caseno"><span>この人の結果（${d.h?"夫であそんだ":"妻であそんだ"}）</span><span>托卵離婚シミュレーター</span></div>
+  <div class="verdict">
+    <div class="pxrow" aria-hidden="true">${px(d.h?"husband":"wife",80)}</div>
+    ${d.l?`<span class="label">${c(d.l,30)}</span>`:""}
+    <span class="total num">${d.t.slice(0,3).map(x=>c(x,20)).join("<br>")}</span>
+    ${d.m?`<span class="lead" style="font-size:1.25rem;color:var(--ink);font-weight:700">${c(d.m,60)}</span>`:""}
+    ${r.length?`<div class="rows num">${r.map(x=>`<span>${c(x,30)}</span>`).join("")}</div>`:""}
+    ${li.length?`<ul class="lines">${li.map(x=>`<li>${c(x,70)}</li>`).join("")}</ul>`:""}
+  </div>
+  <p class="lead">托卵（たくらん）＝妻がほかの男性との子を、夫の子として育てさせること。あなたなら、どうなる？</p>
+  <div class="next"><button class="go" id="play">自分もあそぶ</button></div>`;
+  $("#play").onclick=()=>{ try{ history.replaceState(null,"",location.pathname+"?v=2"); }catch(e){} S.lookH=S.lookW=0; viewTitle(); }; toTop(); }
 let IMG_BLOB=null;
 document.addEventListener("pointerdown",e=>{ if(e.target.closest&&e.target.closest(".xpost")){ IMG_BLOB=null; resultImage().then(b=>{IMG_BLOB=b;}).catch(()=>{}); } },true);
 document.addEventListener("click",e=>{ const t=e.target.closest&&e.target.closest(".xpost"); if(!t) return; const u=t.dataset.u, note=t.parentNode.querySelector(".xnote");
   try{ if(navigator.clipboard && window.ClipboardItem){ navigator.clipboard.write([new ClipboardItem({"image/png":IMG_BLOB||resultImage()})]).then(()=>{ if(note) note.textContent="結果の画像をコピーしました。Xの投稿画面で貼り付けできます。"; },()=>{}); } }catch(err){}
-  const w=window.open(u,"_blank"); if(!w) location.href=u; });
+  const u2=u.split("&url=")[0]+"&url="+encodeURIComponent(shareUrl()); const w=window.open(u2,"_blank"); if(!w) location.href=u2; });
 const GAME_URL="https://ore-tarou.github.io/takuran-sim/?v=2";
 function postUrl(r,w,meH){
   const sup=r.pretend?"気づかないふりをした":r.stay?"離婚はしなかった":r.supFromMe>0?`毎月の養育費 ${yen(r.supMonth)} を払う`:r.supToMe>0?`毎月の養育費 ${yen(r.supMonth)} を受け取る`:"養育費なし";
@@ -1569,7 +1588,7 @@ function viewGuide(back){
   $("#gback").onclick=back; $("#gback2").onclick=back;
   toTop();
 }
-viewTitle();
+{ const sh=readShared(); if(sh) viewShared(sh); else viewTitle(); }
 </script>
 
 </body>
