@@ -821,10 +821,9 @@ function nextYear(){
     st.log.push(kf.length?kf[0]:flavor()); }
   if(st.base.style!=="主夫" && !st.ill && st.base.h>0){ const d=st.year%10, h0=st.base.h; let ch=false;
     st.bizYear=st.bizYear||rint(3,15);
-    if(st.year===st.bizYear && R()<.1){ const g=R()*.1;
-      if(g<.01){ st.base.h=Math.min(3000,r10(h0*5)); st.assets+=2000; st.biz="win"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大成功した。年収は ${man(h0)} から ${man(st.base.h)} に。貯金も2,000万円ふえた。`); ch=true; }
-      else if(g<.03){ st.base.h=r10(h0*.5); st.assets=0; st.biz="lose"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大失敗した。貯金をすべて失い、年収は ${man(h0)} から ${man(st.base.h)} に下がった。`); ch=true; }
-      else { st.biz="so"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大もうけも大損もせず、年収は前と同じくらいに落ち着いた。`); }
+    if(st.year===st.bizYear && R()<.03){ const g=R();
+      if(g<.3){ st.base.h=Math.min(3000,r10(h0*5)); st.assets+=2000; st.biz="win"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大成功した。年収は ${man(h0)} から ${man(st.base.h)} に。貯金も2,000万円ふえた。`); ch=true; }
+      else { st.base.h=r10(h0*.5); st.assets=0; st.biz="lose"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大失敗した。貯金をすべて失い、年収は ${man(h0)} から ${man(st.base.h)} に下がった。`); ch=true; }
     }
     if(ch){} else if(d===5 && R()<.2){ st.base.h=r10(h0*1.2); st.log.push(`${meH?"":"夫が"}転職した。年収が ${man(h0)} から ${man(st.base.h)} に上がった。`); ch=true; }
     else if((d===3||d===8) && R()<.05){ st.ill=true; st.base.h=r10(h0*.3); st.log.push(`${meH?"病気でたおれた。":"夫が病気でたおれた。"}働けなくなり、収入は手当と年金だけになった（年 ${man(h0)} → ${man(st.base.h)}）。`); ch=true; }
