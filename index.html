@@ -821,9 +821,10 @@ function nextYear(){
     st.log.push(kf.length?kf[0]:flavor()); }
   if(st.base.style!=="主夫" && !st.ill && st.base.h>0){ const d=st.year%10, h0=st.base.h; let ch=false;
     st.bizYear=st.bizYear||rint(3,15);
-    if(st.year===st.bizYear){ const g=R();
+    if(st.year===st.bizYear && R()<.1){ const g=R()*.1;
       if(g<.01){ st.base.h=Math.min(3000,r10(h0*5)); st.assets+=2000; st.biz="win"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大成功した。年収は ${man(h0)} から ${man(st.base.h)} に。貯金も2,000万円ふえた。`); ch=true; }
       else if(g<.03){ st.base.h=r10(h0*.5); st.assets=0; st.biz="lose"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大失敗した。貯金をすべて失い、年収は ${man(h0)} から ${man(st.base.h)} に下がった。`); ch=true; }
+      else { st.biz="so"; st.log.push(`${meH?"":"夫が"}会社をやめて起業した。大もうけも大損もせず、年収は前と同じくらいに落ち着いた。`); }
     }
     if(ch){} else if(d===5 && R()<.2){ st.base.h=r10(h0*1.2); st.log.push(`${meH?"":"夫が"}転職した。年収が ${man(h0)} から ${man(st.base.h)} に上がった。`); ch=true; }
     else if((d===3||d===8) && R()<.05){ st.ill=true; st.base.h=r10(h0*.3); st.log.push(`${meH?"病気でたおれた。":"夫が病気でたおれた。"}働けなくなり、収入は手当と年金だけになった（年 ${man(h0)} → ${man(st.base.h)}）。`); ch=true; }
@@ -874,7 +875,7 @@ function viewYear(){
   <div class="bigp num" style="font-size:2.2rem">結婚 <span class="yearnum">${st.year}</span>年目</div>
   <div><div class="yearbar"><i id="ybar" style="width:${Math.max(0,st.year-1)/st.end*100}%"></i>${st.kids.filter(k=>k.by<=st.year).map(k=>`<b style="left:${k.by/st.end*100}%"></b>`).join("")}</div><div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--sub)"><span>結婚</span><span>たて線＝子どもが生まれた年</span><span>${st.end}年目</span></div></div>
   <div class="pxrow" aria-hidden="true" style="min-height:64px">${px("husband",64)}${px("wife",64)}${kids.map(k=>px("kid",28+Math.min(k.age,17)*1.6|0)).join("")}</div>
-  <div style="font-size:.85rem;color:var(--sub)">子ども ${kids.length}人${kids.length?"（"+kids.map(k=>k.age+"歳").join("・")+"）":""}<br>夫：${st.base.style==="主夫"?"主夫":st.ill?"病気で休んでいる":st.biz==="win"?"社長":"会社員"}（年収 ${man(st.base.h)}・手取り 約${man(takeHome(st.base.h))}）　妻：${wJobOf(st.base)}（${st.base.w>0?`年収 ${man(st.base.w)}・手取り 約${man(takeHome(st.base.w))}`:"収入なし"}）<br>手取り＝税金と保険料を引いたあと。貯金は手取りから増える。</div>
+  <div style="font-size:.85rem;color:var(--sub)">子ども ${kids.length}人${kids.length?"（"+kids.map(k=>k.age+"歳").join("・")+"）":""}<br>夫：${st.base.style==="主夫"?"主夫":st.ill?"病気で休んでいる":st.biz==="win"?"社長":st.biz?"自営業":"会社員"}（年収 ${man(st.base.h)}・手取り 約${man(takeHome(st.base.h))}）　妻：${wJobOf(st.base)}（${st.base.w>0?`年収 ${man(st.base.w)}・手取り 約${man(takeHome(st.base.w))}`:"収入なし"}）<br>手取り＝税金と保険料を引いたあと。貯金は手取りから増える。</div>
   <div style="font-size:.95rem;font-weight:700">貯金 <span class="num" style="font-size:1.25rem">${man(Math.round(st.assets))}</span>　<span style="font-weight:400;font-size:.8rem;color:var(--sub)">今年 ${st.dA>=0?"＋":"−"}${man(Math.abs(Math.round(st.dA)))}${st.nk?`（子育て費 −${man(KIDCOST*st.nk)}）`:""}</span></div>
   ${meH&&st.care?`<div style="font-size:.85rem;font-weight:700">育児への関わり ${"●".repeat(Math.min(st.care,6))}${"○".repeat(Math.max(0,6-st.care))}</div>`:""}
   ${!meH&&st.year>st.firstFake?`<div><div style="font-size:.85rem;font-weight:700">夫の疑い ${Math.round(st.sus)}%</div><div style="height:12px;border:2px solid var(--ink)"><div style="height:100%;width:${Math.min(100,st.sus)}%;background:var(--stamp)"></div></div></div>`:""}
