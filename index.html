@@ -1196,7 +1196,7 @@ function endPretend(){
     <span class="total num">あなたは<br>最後まで<br>気づかないふりをした</span>
     <ul class="lines"><li>子ども${kids.length}人のうち <b>${fk}人</b> は、あなたの子ではなかった。あなたは${st.year-st.knowYear}年間、それを知っていた。</li><li>托卵の子は全員、大人になった。最後まで、だれにも言わなかった。</li><li>かかったお金：DNA鑑定の ${man(DNA_PRIVATE)} だけ。否認の期限も、慰謝料を請求する期限も、とっくに過ぎた。</li><li>妻は、あなたが知っていることを、いまも知らない。</li></ul>
   </div>
-  <div class="next"><a class="go" target="_blank" rel="noopener" style="text-decoration:none" href="${"https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(GAME_URL)}">結果をXにポストする</a></div>
+  <div class="next"><button class="go xpost" data-u="${"https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(GAME_URL)}">結果をXにポストする</button></div>
   <div class="next"><button class="ghost" id="again">もう一回あそぶ</button></div>`;
   $("#again").onclick=startStory; $("#top").onclick=viewTitle; toTop();
 }
@@ -1214,7 +1214,7 @@ function viewNever(knew){
       ?`<li>子ども${kids.length}人のうち <b>${fk}人</b> は、あなたの子ではなかった。</li><li>失ったお金：0円。あなたは何も知らないまま、子どもたちは大人になった。</li><li>知らないほうが幸せだったのかは、だれにも分からない。</li>`
       :none?(st.husKnows?`<li>子どもをおろしたので、夫の子ではない子は生まれなかった。</li><li>払ったお金：0円。離婚もしなかった。</li><li>夫は、あの一晩のことを知っている。やり直すとは言ったが、家の中は前と同じではない。</li>`:`<li>子どもをおろしたので、夫の子ではない子は生まれなかった。</li><li>払ったお金：0円。夫は何も知らない。</li><li>あの一晩のことは、だれにも話していない。</li>`):`<li>子ども${kids.length}人のうち <b>${fk}人</b> は、夫の子ではない。夫はいまも知らない。</li><li>払ったお金：0円。ただし、この秘密は一生つづく。</li><li>嫡出否認の期限（3年）はとっくに過ぎた。今からバレても、法律上は夫の子のまま。</li>`}</ul>
   </div>
-  <div class="next"><a class="go" target="_blank" rel="noopener" style="text-decoration:none" href="${"https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(GAME_URL)}">結果をXにポストする</a></div>
+  <div class="next"><button class="go xpost" data-u="${"https://x.com/intent/post?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(GAME_URL)}">結果をXにポストする</button></div>
   <div class="next"><button class="ghost" id="again">もう一回あそぶ</button><button class="ghost" id="swap">${meH?"妻であそぶ":"夫であそぶ"}</button><button class="ghost" id="top">最初へ</button></div>`;
   clearTimeout(S.tick); $("#again").onclick=startStory; $("#top").onclick=viewTitle; $("#swap").onclick=()=>{ S.scenario=meH?"me":"wife"; startStory(); };
   toTop();
@@ -1454,7 +1454,7 @@ function viewVerdict(){
     ${r.supFromMe>0||r.supToMe>0?`<div class="sheet" style="margin:0"><b>養育費（上の金額に入っている）</b><br>${r.supFromMe>0?"払う":"受け取る"}：毎月 ${yen(r.supMonth)}、下の子が20歳になるまで ${r.supYears}年、合計 約${man(r.supFromMe||r.supToMe)}${r.supStuckNote||""}</div>`:""}
     ${lines.length?`<ul class="lines">${lines.map(l=>`<li>${esc(l)}</li>`).join("")}</ul>`:""}
   </div>
-  <div class="next"><a class="go" id="post" target="_blank" rel="noopener" style="text-decoration:none" href="${postUrl(r,w,meH)}">結果をXにポストする</a><button class="ghost" id="copy">リンクをコピー</button><span id="copied" class="lead" aria-live="polite"></span></div>
+  <div class="next"><button class="go xpost" data-u="${postUrl(r,w,meH)}">結果をXにポストする</button><button class="ghost" id="copy">リンクをコピー</button><span id="copied" class="lead" aria-live="polite"></span></div>
   ${r.hidden?"":optimalHtml()}
   <div class="next"><button class="ghost" id="again">${S.mode==="random"?"もう一回あそぶ":"数字を変えてやり直す"}</button><button class="ghost" id="swap">${meH?"妻の側でやってみる（私の托卵がバレた！）":"夫の側でやってみる（妻が托卵していた！）"}</button><button class="ghost" id="guide">解説を読む</button><button class="backbtn" id="top">← 最初へもどる</button></div>
   <p class="note">これはゲームです。慰謝料の上乗せと年収のくじはゲーム用の目安、弁護士費用は弁護士ドットコムの集計（2026年6月）の中央値で、養育費は裁判所の算定表（2019年版）の式で計算しています。嫡出否認は、2024年4月以降に生まれた子は「知ってから3年」、それより前に生まれた子は「知ってから1年」の決まりです（ゲームでは2歳以下を否認できる子としています）。養育費は、20歳までの合計を最後の金額に入れています。実際の金額は事情で大きく変わるので、本当に困ったときは弁護士に相談してください。</p>`;
@@ -1465,6 +1465,26 @@ function viewVerdict(){
   $("#copy").onclick=()=>{ const done=t=>{$("#copied").textContent=t;}; try{ navigator.clipboard.writeText(GAME_URL).then(()=>done("コピーしました"),()=>done(GAME_URL)); }catch(e){ done(GAME_URL); } };
   toTop();
 }
+function resultImage(){ const v=document.querySelector(".verdict"); const W=1200,H=1000,c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
+  x.fillStyle="#f6f6f3"; x.fillRect(0,0,W,H); x.strokeStyle="#1b1b1f"; x.lineWidth=8; x.strokeRect(24,24,W-48,H-48);
+  const meH=S.scenario==="wife", nm=(meH?"husband":"wife")+((meH?S.lookH:S.lookW)||""), g=PX[nm]||PX.husband, sc=10;
+  g.forEach((row,y)=>[...row].forEach((ch,i)=>{ if(ch!=="."){ x.fillStyle=PX_PAL[ch]; x.fillRect(70+i*sc,170+y*sc,sc,sc); } }));
+  const G='"BIZ UDPGothic",sans-serif'; x.fillStyle="#1b1b1f"; x.textBaseline="top";
+  x.font="700 36px "+G; x.fillText("托卵離婚シミュレーター",70,64); x.textAlign="right"; x.fillText(meH?"あなた＝夫":"あなた＝妻",1130,64); x.textAlign="left";
+  x.fillRect(70,120,1060,3);
+  const tot=((v&&v.querySelector(".total"))||{innerText:""}).innerText.split("\n").filter(Boolean).slice(0,3);
+  x.font='800 80px "Shippori Mincho B1",serif'; tot.forEach((t,i)=>x.fillText(t,270,160+i*98,860));
+  let y=490; x.fillRect(70,y-24,1060,2);
+  const sp=v?[...v.querySelectorAll(".rows span")].map(e=>e.innerText.trim()):[];
+  if(sp.length){ x.font="700 34px "+G; for(let i=0;i<sp.length&&i<14;i+=2){ x.textAlign="left"; x.fillText(sp[i],70,y,700); x.textAlign="right"; x.fillText(sp[i+1]||"",1130,y); y+=56; } x.textAlign="left"; }
+  else { x.font="400 29px "+G; const ls=v?[...v.querySelectorAll(".lines li")].map(e=>e.innerText.trim()):[]; for(const l of ls.slice(0,4)){ for(let k=0;k<l.length&&k<72;k+=36){ x.fillText((k?"　":"・")+l.slice(k,k+36)+(k+36<l.length&&k+36>=72?"…":""),70,y); y+=44; } y+=10; } }
+  x.fillRect(70,900,1060,2); x.font="400 28px "+G; x.fillText("ore-tarou.github.io/takuran-sim　#托卵離婚シミュレーター",70,922);
+  return new Promise(r=>c.toBlob(r,"image/png")); }
+document.addEventListener("click",async e=>{ const b=e.target.closest&&e.target.closest(".xpost"); if(!b) return; const u=b.dataset.u;
+  try{ if(navigator.canShare && matchMedia("(pointer:coarse)").matches){ const blob=await resultImage(); const file=new File([blob],"takuran-result.png",{type:"image/png"});
+      if(navigator.canShare({files:[file]})){ const t=decodeURIComponent((u.match(/text=([^&]*)/)||[])[1]||""); await navigator.share({files:[file],text:t+"\n"+GAME_URL}); return; } } }
+  catch(err){ if(err&&err.name==="AbortError") return; }
+  const w=window.open(u,"_blank"); if(!w) location.href=u; });
 const GAME_URL="https://ore-tarou.github.io/takuran-sim/?v=2";
 function postUrl(r,w,meH){
   const sup=r.pretend?"気づかないふりをした":r.stay?"離婚はしなかった":r.supFromMe>0?`毎月の養育費 ${yen(r.supMonth)} を払う`:r.supToMe>0?`毎月の養育費 ${yen(r.supMonth)} を受け取る`:"養育費なし";
