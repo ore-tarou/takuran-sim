@@ -656,7 +656,7 @@ function calcStay(f){
     net-=DNA_PRIVATE;
     items.push({what:"かかったお金",amt:"−"+man(DNA_PRIVATE),law:"目安",why:"自分でしたDNA鑑定の費用だけ。"});
     const fu=futItem(f); items.push(fu.item);
-    return {fut:fu.fut,stay:true,pretend:true,items,net,konMe:0,mo:0,isha:0,hPays:0,supTot:0,supMonth:0,supToMe:0,supFromMe:0,supYears:0,supPayer:"",cost:DNA_PRIVATE,denied:[],stuck:fakes,liveWith:"夫",meHusband:true,kidsWithWife:[],kidsWithHusband:f.kids};
+    return {fut:fu.fut,stay:true,pretend:true,items,net:net-fu.fut.total,net0:net,konMe:0,mo:0,isha:0,hPays:0,supTot:0,supMonth:0,supToMe:0,supFromMe:0,supYears:0,supPayer:"",cost:DNA_PRIVATE,denied:[],stuck:fakes,liveWith:"夫",meHusband:true,kidsWithWife:[],kidsWithHusband:f.kids};
   }
   fakes.forEach(k=>{ const ok=k.age<3;
     items.push({what:`托卵の子${k.n?"・"+k.n:""}（${k.age}歳）の嫡出否認`,amt: ok?"否認する":"否認できない",law:"民法777条",
@@ -672,7 +672,7 @@ function calcStay(f){
   net-=cost;
   items.push({what:"手続きの費用",amt:"−"+man(cost),law:"目安",f:parts.join(" ＋ ")+` ＝ ${man(cost)}`,why:"浮気相手への請求を弁護士に頼んだ場合の目安。"});
   const fu=futItem(f); items.push(fu.item);
-  return {fut:fu.fut,stay:true,items,net,konMe:0,mo:0,isha:SI,hPays:0,supTot:0,supMonth:0,supToMe:0,supFromMe:0,supYears:0,supPayer:"",cost,denied,stuck,liveWith:"夫",meHusband:true,kidsWithWife:[],kidsWithHusband:f.kids};
+  return {fut:fu.fut,stay:true,items,net:net-fu.fut.total,net0:net,konMe:0,mo:0,isha:SI,hPays:0,supTot:0,supMonth:0,supToMe:0,supFromMe:0,supYears:0,supPayer:"",cost,denied,stuck,liveWith:"夫",meHusband:true,kidsWithWife:[],kidsWithHusband:f.kids};
 }
 // 親権が父に行く見込み（%）。裁判所の判断基準：監護の継続性（主に誰が育ててきたか・いま誰と住んでいるか）、15歳以上の子の意見、兄弟を分けない。浮気・托卵をした側かどうかは親権には原則関係しない
 function custodyChance(f){
@@ -1360,7 +1360,7 @@ function viewSettle(){
 function evalPaths(){
   const base=S.fam, sc=S.scenario, meH=sc==="wife";
   const real=base.kids.some(k=>!k.fake), c=custodyChance(base).p, q=c/100;
-  const run=mod=>{ const f=JSON.parse(JSON.stringify(base)); f.stay=false; f.pretend=false; f.fight=null; mod(f); const r=calc(f,sc); return r.net-(meH?(r.stay?r.fut.total:futureCost(f,r.kidsWithHusband||[],false).total):0); };
+  const run=mod=>{ const f=JSON.parse(JSON.stringify(base)); f.stay=false; f.pretend=false; f.fight=null; mod(f); const r=calc(f,sc); return r.net-(meH?(r.stay?0:futureCost(f,r.kidsWithHusband||[],false).total):0); };
   const fightEV=(proc)=>q*run(f=>{f.proc=proc;f.fight={p:c,won:true};})+(1-q)*run(f=>{f.proc=proc;f.fight={p:c,won:false};});
   const rows=[];
   if(meH){
@@ -1446,10 +1446,11 @@ function viewVerdict(){
       ${r.stay?"":`<span>財産分与</span><span>${sign(meH?-r.hPays:r.hPays)}${man(Math.abs(r.hPays))}</span>`}
             ${r.konMe?`<span>婚姻費用（離婚までの${r.mo}か月）</span><span>${r.konMe>0?"＋":"−"}${man(Math.abs(r.konMe))}</span>`:""}
       ${r.supFromMe>0||r.supToMe>0?`<span>養育費（20歳までの合計）</span><span>${r.supToMe>0?"＋":"−"}${man(r.supFromMe||r.supToMe)}</span>`:""}
+      ${r.stay&&r.fut&&r.fut.total>0?`<span>これからの生活費（20歳までの合計）</span><span>−${man(r.fut.total)}</span>`:""}
       <span>手続きの費用</span><span>−${man(r.cost)}</span>
       ${r.extra?`<span>口止めに払ったお金</span><span>−${man(r.extra)}</span>`:""}
     </div>
-    ${r.stay&&r.fut&&r.fut.total>0?`<div class="sheet" style="margin:0"><b>これからの生活費（上の金額とは別）</b><br>子どもと妻の生活費として、夫の負担は毎月 約${yen(r.fut.month)}。下の子が20歳になるまでで、合計 約${man(r.fut.total)}（子ども ${man(r.fut.kid.total)} ＋ 妻 ${man(r.fut.wife.total)}）</div>`:""}
+    ${r.stay&&r.fut&&r.fut.total>0?`<div class="sheet" style="margin:0"><b>これからの生活費（上の金額に入っている）</b><br>子どもと妻の生活費として、夫の負担は毎月 約${yen(r.fut.month)}。下の子が20歳になるまでで、合計 約${man(r.fut.total)}（子ども ${man(r.fut.kid.total)} ＋ 妻 ${man(r.fut.wife.total)}）</div>`:""}
     ${r.supFromMe>0||r.supToMe>0?`<div class="sheet" style="margin:0"><b>養育費（上の金額に入っている）</b><br>${r.supFromMe>0?"払う":"受け取る"}：毎月 ${yen(r.supMonth)}、下の子が20歳になるまで ${r.supYears}年、合計 約${man(r.supFromMe||r.supToMe)}${r.supStuckNote||""}</div>`:""}
     ${lines.length?`<ul class="lines">${lines.map(l=>`<li>${esc(l)}</li>`).join("")}</ul>`:""}
   </div>
